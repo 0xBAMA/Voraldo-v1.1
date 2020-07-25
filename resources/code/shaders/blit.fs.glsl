@@ -13,7 +13,7 @@ void main()
 	//{
 		//uint s = imageLoad(current, ivec2(imageSize(current)*(0.5*(v_pos+vec2(1))))).r>>3;
 	
-		fragment_output = vec4(0.1*v_pos.x,0.6*v_pos.y,0,1);
+		fragment_output = vec4(v_pos.x,v_pos.y,v_pos.x*v_pos.y,1);
 //	}
 	//else
 	//{

@@ -5,30 +5,44 @@
 
 class Voraldo
 {
-public:
+	public:
 
-	Voraldo();
-	~Voraldo();
+		Voraldo();
+		~Voraldo();
 
-private:
+	private:
 
-	SDL_Window * window;
-	SDL_GLContext GLcontext;
+		SDL_Window * window;
+		SDL_GLContext GLcontext;
 
-	ImVec4 clear_color;
+		ImVec4 clear_color;
 
-	GLuint display_shader;
-	GLuint display_vao;
-	GLuint display_vbo;
+		GLuint display_shader;
+		GLuint display_vao;
+		GLuint display_vbo;
+
+		std::deque<float> fps_history;
+
+		bool show_fpsoverlay = true;
+		bool show_demo_window = true;
+		bool show_controls = true;
+	
 
 
-	void create_window();
-	void gl_setup();
-	void draw_everything();
+		void ControlWindow(bool *open);
+		void AppMainMenuBar();
+		void ShowExampleMenuFile();
+		void FPSOverlay(bool* p_open);
+		void HelpMarker(const char* desc);
 
-	void quit();
 
-	bool pquit;
+		void create_window();
+		void gl_setup();
+		void draw_everything();
+
+		void quit();
+
+		bool pquit;
 
 };
 

@@ -3,98 +3,94 @@
 
 void Voraldo::create_window()
 {
-	if(SDL_Init( SDL_INIT_EVERYTHING ) != 0)
-	{
-		printf("Error: %s\n", SDL_GetError());
-	}
+    if(SDL_Init( SDL_INIT_EVERYTHING ) != 0)
+    {
+        printf("Error: %s\n", SDL_GetError());
+    }
 
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+    SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
+    SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
 
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, 8);
+    SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, 8);
 
-	// this is how you query the screen resolution
-	SDL_DisplayMode dm;
-	SDL_GetDesktopDisplayMode(0, &dm);
+    // this is how you query the screen resolution
+    SDL_DisplayMode dm;
+    SDL_GetDesktopDisplayMode(0, &dm);
 
-	// pulling these out because I'm going to try to span the whole screen with
-	// the window, in a way that's flexible on different resolution screens
-	int total_screen_width = dm.w;
-	int total_screen_height = dm.h;
+    // pulling these out because I'm going to try to span the whole screen with
+    // the window, in a way that's flexible on different resolution screens
+    int total_screen_width = dm.w;
+    int total_screen_height = dm.h;
 
-	cout << "creating window...";
+    cout << "creating window...";
 
-	// window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
-	window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
-  	SDL_ShowWindow(window);
+    // window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
+    window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
+    SDL_ShowWindow(window);
 
-	cout << "done." << endl;
-
-
-	cout << "setting up OpenGL context...";
-	// OpenGL 4.3 + GLSL version 430
-	const char* glsl_version = "#version 430";
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
-	GLcontext = SDL_GL_CreateContext( window );
-
-	SDL_GL_MakeCurrent(window, GLcontext);
-	SDL_GL_SetSwapInterval(1); // Enable vsync
-	// SDL_GL_SetSwapInterval(0); // explicitly disable vsync
-
-    // CONTINUUM REPRESENTATION POINTS
+    cout << "done." << endl;
 
 
+    cout << "setting up OpenGL context...";
+    // OpenGL 4.3 + GLSL version 430
+    const char* glsl_version = "#version 430";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
+    GLcontext = SDL_GL_CreateContext( window );
+
+    SDL_GL_MakeCurrent(window, GLcontext);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+    // SDL_GL_SetSwapInterval(0); // explicitly disable vsync
 
 
+    if (glewInit() != GLEW_OK)
+    {
+        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+    }
 
-
-
-
-
-	if (glewInit() != GLEW_OK)
-	{
-		fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-	}
-
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
 
     glPointSize(3.0);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io; // void cast prevents unused variable warning
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io; // void cast prevents unused variable warning
 
-	ImGui::StyleColorsDark();
+    ImGui::StyleColorsDark();
 
-	// Setup Platform/Renderer bindings
-	ImGui_ImplSDL2_InitForOpenGL(window, GLcontext);
-	ImGui_ImplOpenGL3_Init(glsl_version);
+    // Setup Platform/Renderer bindings
+    ImGui_ImplSDL2_InitForOpenGL(window, GLcontext);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 
-	clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 75.0f/255.0f, 0.5f); // initial value for clear color
+    clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 75.0f/255.0f, 0.5f); // initial value for clear color
 
-	// really excited by the fact imgui has an hsv picker to set this
-	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-	glClear( GL_COLOR_BUFFER_BIT );
-	SDL_GL_SwapWindow( window );
+    // really excited by the fact imgui has an hsv picker to set this
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear( GL_COLOR_BUFFER_BIT );
+    SDL_GL_SwapWindow( window );
 
-	cout << "done." << endl;
+    cout << "done." << endl;
 
-	ImVec4* colors = ImGui::GetStyle().Colors;
+
+    #define FPS_HISTORY_SIZE 95
+    fps_history.resize(FPS_HISTORY_SIZE);   //initialize the array of fps values
+
+
+    ImVec4* colors = ImGui::GetStyle().Colors;
 
 
     colors[ImGuiCol_Text]                   = ImVec4(0.67f, 0.50f, 0.16f, 1.00f);
@@ -146,17 +142,20 @@ void Voraldo::create_window()
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.FrameRounding = 2;
+    style.WindowRounding = 3;
 }
 
 void Voraldo::gl_setup()
 {
-	// some info on your current platform
-	const GLubyte *renderer = glGetString( GL_RENDERER ); // get renderer string
-	const GLubyte *version = glGetString( GL_VERSION );		// version as a string
-	printf( "Renderer: %s\n", renderer );
-	printf( "OpenGL version supported %s\n\n\n", version );
-
-
+    // some info on your current platform
+    const GLubyte *renderer = glGetString( GL_RENDERER ); // get renderer string
+    const GLubyte *version = glGetString( GL_VERSION );  // version as a string
+    printf( "Renderer: %s\n", renderer );
+    printf( "OpenGL version supported %s\n\n\n", version );
 
     // create the shader for the triangles to cover the screen
     display_shader = Shader("resources/code/shaders/blit.vs.glsl", "resources/code/shaders/blit.fs.glsl").Program;
@@ -207,14 +206,11 @@ void Voraldo::gl_setup()
     glVertexAttribPointer(points_attrib, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*) (static_cast<const char*>(0) + (0)));
     cout << "done." << endl;
 
-
     // create the image textures
 
     // compile the compute shader to do the raycasting
 
     // ...
-
-
 
 }
 
@@ -222,25 +218,25 @@ void Voraldo::gl_setup()
 // these are some utility functions for the imgui stuff
 
 // basically just a tooltip, useful for including a note that won't shit up a significant chunk of the window
-void HelpMarker(const char* desc)
+void Voraldo::HelpMarker(const char* desc)
 {
-	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(desc);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
 }
 
 
 // small overlay to show the FPS counter, FPS graph
-void FPSOverlay(bool* p_open)
+void Voraldo::FPSOverlay(bool* p_open)
 {
-    const float DISTANCE = 10.0f;
-    static int corner = 0;
+    const float DISTANCE = 2.0f;
+    static int corner = 3;
     ImGuiIO& io = ImGui::GetIO();
     if (corner != -1)
     {
@@ -251,12 +247,30 @@ void FPSOverlay(bool* p_open)
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
     if (ImGui::Begin("Example: Simple overlay", p_open, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
-        ImGui::Text("Simple overlay\n" "in the corner of the screen.\n" "(right-click to change position)");
-        ImGui::Separator();
-        if (ImGui::IsMousePosValid())
-            ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
-        else
-            ImGui::Text("Mouse Position: <invalid>");
+        // ImGui::Text("Simple overlay\n" "in the corner of the screen.\n" "(right-click to change position)");
+        // ImGui::Separator();
+        // if (ImGui::IsMousePosValid())
+        //     ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+        // else
+        //     ImGui::Text("Mouse Position: <invalid>");
+
+
+        // fps graph
+        static float values[FPS_HISTORY_SIZE] = {};
+        float average = 0;
+
+        for(int n = 0; n < FPS_HISTORY_SIZE; n++)
+        {
+            values[n] = fps_history[n];
+            average += fps_history[n];
+        }
+
+        average /= FPS_HISTORY_SIZE;
+        char overlay[32];
+        sprintf(overlay, "avg %.2f fps (%.2f ms)", average, 1000.0f/average);
+        ImGui::PlotLines("", values, IM_ARRAYSIZE(values), 0, overlay, 0.0f, 100.0f, ImVec2(240,60));
+
+
         if (ImGui::BeginPopupContextWindow())
         {
             if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
@@ -273,7 +287,7 @@ void FPSOverlay(bool* p_open)
 
 
 // populates a menu dropdown, this will change significantly as I figure out what functionality I'm going to include
-void ShowExampleMenuFile()
+void Voraldo::ShowExampleMenuFile()
 {
     ImGui::MenuItem("(dummy menu)", NULL, false, false);
     if (ImGui::MenuItem("New")) {}
@@ -351,7 +365,7 @@ void ShowExampleMenuFile()
 
 
 // this is my top bar menu
-void AppMainMenuBar()
+void Voraldo::AppMainMenuBar()
 {
     if (ImGui::BeginMainMenuBar())
     {
@@ -366,7 +380,7 @@ void AppMainMenuBar()
             if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
             ImGui::Separator();
             if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-            if (ImGui::MenuItem("Copy", "CTRL+C")) {cout << "copy" << endl;}
+            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
             if (ImGui::MenuItem("Paste", "CTRL+V")) {}
             ImGui::EndMenu();
         }
@@ -375,13 +389,13 @@ void AppMainMenuBar()
 }
 
 
-void ControlWindow()
+void Voraldo::ControlWindow(bool *open)
 {
     ImGuiWindowFlags flags = 0;
 
     ImGui::SetNextWindowPos(ImVec2(0,19));
     ImGui::SetNextWindowSize(ImVec2(320,385), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Controls", NULL, flags);
+    ImGui::Begin("Controls", open, flags);
 
 
   // tabbed layout
@@ -444,18 +458,25 @@ void ControlWindow()
     //do the other widgets
    HelpMarker("shut up, compiler");
 
-
    ImGui::End();
 }
 
 void Voraldo::draw_everything()
 {
-	ImGuiIO& io = ImGui::GetIO(); (void)io; // void cast prevents unused variable warning
+    ImGuiIO& io = ImGui::GetIO(); (void)io; // void cast prevents unused variable warning
     //get the screen dimensions and pass in as uniforms
 
+  //maintaining history of fps values
+  //push back - put in the new value
+    fps_history.push_back(io.Framerate);
 
-	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the background
+  //pop front - take out the oldest value
+    fps_history.pop_front();
+
+
+
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the background
 
 
 
@@ -473,47 +494,47 @@ void Voraldo::draw_everything()
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 
 
-	// Start the Dear ImGui frame
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(window);
-	ImGui::NewFrame();
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(window);
+    ImGui::NewFrame();
+
 
 
     // draw the menu bar
     AppMainMenuBar();
 
+    // draw the FPS overlay
+    FPSOverlay(&show_fpsoverlay);
 
-	// show the demo window
-	static bool show_demo_window = true;
-	if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
+    // do my own window
+    ControlWindow(&show_controls);
 
-
-	// do my own window
-    ControlWindow();
-
+    // show the demo window
+    if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
     // get the data go the GPU
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());   // put imgui data into the framebuffer
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());   // put imgui data into the framebuffer
 
-	SDL_GL_SwapWindow(window);  // swap the double buffers
+    SDL_GL_SwapWindow(window);  // swap the double buffers
 
-	// handle events
+    // handle events
 
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		ImGui_ImplSDL2_ProcessEvent(&event);
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        ImGui_ImplSDL2_ProcessEvent(&event);
 
-		if (event.type == SDL_QUIT)
-			pquit = true;
+        if (event.type == SDL_QUIT)
+            pquit = true;
 
-		if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-			pquit = true;
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+            pquit = true;
 
-		if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
-			pquit = true;
-	}
+        if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
+            pquit = true;
+    }
 }
 
 
