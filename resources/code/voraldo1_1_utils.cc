@@ -219,7 +219,10 @@ void Voraldo::gl_setup()
 }
 
 
-static void HelpMarker(const char* desc)
+// these are some utility functions for the imgui stuff
+
+// basically just a tooltip, useful for including a note that won't shit up a significant chunk of the window
+void HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
 	if (ImGui::IsItemHovered())
@@ -230,6 +233,216 @@ static void HelpMarker(const char* desc)
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
+}
+
+
+// small overlay to show the FPS counter, FPS graph
+void FPSOverlay(bool* p_open)
+{
+    const float DISTANCE = 10.0f;
+    static int corner = 0;
+    ImGuiIO& io = ImGui::GetIO();
+    if (corner != -1)
+    {
+        ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+        ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+    }
+    ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+    if (ImGui::Begin("Example: Simple overlay", p_open, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+        ImGui::Text("Simple overlay\n" "in the corner of the screen.\n" "(right-click to change position)");
+        ImGui::Separator();
+        if (ImGui::IsMousePosValid())
+            ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+        else
+            ImGui::Text("Mouse Position: <invalid>");
+        if (ImGui::BeginPopupContextWindow())
+        {
+            if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
+            if (ImGui::MenuItem("Top-left",     NULL, corner == 0)) corner = 0;
+            if (ImGui::MenuItem("Top-right",    NULL, corner == 1)) corner = 1;
+            if (ImGui::MenuItem("Bottom-left",  NULL, corner == 2)) corner = 2;
+            if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
+            if (p_open && ImGui::MenuItem("Close")) *p_open = false;
+            ImGui::EndPopup();
+        }
+    }
+    ImGui::End();
+}
+
+
+// populates a menu dropdown, this will change significantly as I figure out what functionality I'm going to include
+void ShowExampleMenuFile()
+{
+    ImGui::MenuItem("(dummy menu)", NULL, false, false);
+    if (ImGui::MenuItem("New")) {}
+    if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+    if (ImGui::BeginMenu("Open Recent"))
+    {
+        ImGui::MenuItem("fish_hat.c");
+        ImGui::MenuItem("fish_hat.inl");
+        ImGui::MenuItem("fish_hat.h");
+        if (ImGui::BeginMenu("More.."))
+        {
+            ImGui::MenuItem("Hello");
+            ImGui::MenuItem("Sailor");
+            if (ImGui::BeginMenu("Recurse.."))
+            {
+                ShowExampleMenuFile();
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+    if (ImGui::MenuItem("Save As..")) {}
+
+    ImGui::Separator();
+    if (ImGui::BeginMenu("Options"))
+    {
+        static bool enabled = true;
+        ImGui::MenuItem("Enabled", "", &enabled);
+        ImGui::BeginChild("child", ImVec2(0, 60), true);
+        for (int i = 0; i < 10; i++)
+            ImGui::Text("Scrolling Text %d", i);
+        ImGui::EndChild();
+        static float f = 0.5f;
+        static int n = 0;
+        ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
+        ImGui::InputFloat("Input", &f, 0.1f);
+        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Colors"))
+    {
+        float sz = ImGui::GetTextLineHeight();
+        for (int i = 0; i < ImGuiCol_COUNT; i++)
+        {
+            const char* name = ImGui::GetStyleColorName((ImGuiCol)i);
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x+sz, p.y+sz), ImGui::GetColorU32((ImGuiCol)i));
+            ImGui::Dummy(ImVec2(sz, sz));
+            ImGui::SameLine();
+            ImGui::MenuItem(name);
+        }
+        ImGui::EndMenu();
+    }
+
+    // Here we demonstrate appending again to the "Options" menu (which we already created above)
+    // Of course in this demo it is a little bit silly that this function calls BeginMenu("Options") twice.
+    // In a real code-base using it would make senses to use this feature from very different code locations.
+    if (ImGui::BeginMenu("Options")) // <-- Append!
+    {
+        static bool b = true;
+        ImGui::Checkbox("SomeOption", &b);
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Disabled", false)) // Disabled
+    {
+        IM_ASSERT(0);
+    }
+    if (ImGui::MenuItem("Checked", NULL, true)) {}
+    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
+}
+
+
+// this is my top bar menu
+void AppMainMenuBar()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            ShowExampleMenuFile();
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+            ImGui::Separator();
+            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+            if (ImGui::MenuItem("Copy", "CTRL+C")) {cout << "copy" << endl;}
+            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
+
+void ControlWindow()
+{
+    ImGui::SetNextWindowPos(ImVec2(10,27));
+    ImGui::SetNextWindowSize(ImVec2(320,385));
+    ImGui::Begin("Controls", NULL, 0);
+
+
+
+  // tabbed layout
+    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
+
+    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+        {
+            if (ImGui::BeginTabItem("Simulation"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Rendering"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Instructions"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Instructions1"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Instructions2"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Instructions3"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Instructions4"))
+            {
+                ImGui::Separator();
+                ImGui::Text(" ");
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+
+    //do the other widgets
+   HelpMarker("shut up, compiler");
+
+
+
+
+
+   ImGui::End();
 }
 
 void Voraldo::draw_everything()
@@ -256,30 +469,25 @@ void Voraldo::draw_everything()
 	ImGui_ImplSDL2_NewFrame(window);
 	ImGui::NewFrame();
 
+
+    // draw the menu bar
+    AppMainMenuBar();
+
+
 	// show the demo window
 	static bool show_demo_window = true;
 	if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
+
 	// do my own window
-	ImGui::SetNextWindowPos(ImVec2(10,27));
-	ImGui::SetNextWindowSize(ImVec2(320,385));
-	ImGui::Begin("Controls", NULL, 0);
+    ControlWindow();
 
 
-
-    //do the other widgets
-   HelpMarker("shut up, compiler");
-
-
-
-
-
-	ImGui::End();
+    // get the data go the GPU
 	ImGui::Render();
-
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());   // put imgui data into the framebuffer
 
-	SDL_GL_SwapWindow(window);			// swap the double buffers
+	SDL_GL_SwapWindow(window);  // swap the double buffers
 
 	// handle events
 
