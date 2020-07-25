@@ -102,7 +102,7 @@ void Voraldo::create_window()
     colors[ImGuiCol_WindowBg]               = ImVec4(0.10f, 0.05f, 0.00f, 1.00f);
     colors[ImGuiCol_ChildBg]                = ImVec4(0.23f, 0.17f, 0.02f, 0.05f);
     colors[ImGuiCol_PopupBg]                = ImVec4(0.12f, 0.07f, 0.01f, 0.94f);
-    colors[ImGuiCol_Border]                 = ImVec4(0.25f, 0.18f, 0.09f, 1.00f);
+    colors[ImGuiCol_Border]                 = ImVec4(0.25f, 0.18f, 0.09f, 0.33f);
     colors[ImGuiCol_BorderShadow]           = ImVec4(0.33f, 0.15f, 0.02f, 0.17f);
     colors[ImGuiCol_FrameBg]                = ImVec4(0.33f, 0.15f, 0.02f, 0.17f);
     colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.19f, 0.09f, 0.02f, 0.17f);
@@ -377,69 +377,72 @@ void AppMainMenuBar()
 
 void ControlWindow()
 {
-    ImGui::SetNextWindowPos(ImVec2(10,27));
-    ImGui::SetNextWindowSize(ImVec2(320,385));
-    ImGui::Begin("Controls", NULL, 0);
+    ImGuiWindowFlags flags = 0;
 
+    ImGui::SetNextWindowPos(ImVec2(0,19));
+    ImGui::SetNextWindowSize(ImVec2(320,385), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Controls", NULL, flags);
 
 
   // tabbed layout
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
 
     if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+    {
+        if (ImGui::BeginTabItem("Simulation"))
         {
-            if (ImGui::BeginTabItem("Simulation"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Rendering"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Instructions"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Instructions1"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Instructions2"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Instructions3"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Instructions4"))
-            {
-                ImGui::Separator();
-                ImGui::Text(" ");
-                ImGui::EndTabItem();
-            }
-
-            ImGui::EndTabBar();
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
         }
 
+        if (ImGui::BeginTabItem("Rendering"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Instructions"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Instructions1"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Instructions2"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Instructions3"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Instructions4"))
+        {
+            ImGui::Separator();
+            ImGui::Text(" ");
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
 
     //do the other widgets
    HelpMarker("shut up, compiler");
-
-
-
 
 
    ImGui::End();
@@ -454,7 +457,13 @@ void Voraldo::draw_everything()
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the background
 
-	// draw the stuff on the GPU
+
+
+
+    // draw the stuff on the GPU
+
+
+
 
     // texture display
     glUseProgram(display_shader);
