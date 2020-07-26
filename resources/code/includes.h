@@ -77,7 +77,7 @@ using std::endl;
 //this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
 #define DIM 256
 
-//this is effectively the shadowmap dimension
+//this is effectively the shadowmap dimension - probaby want to reduce this eventually
 #define LIGHT_DIM 2048
 
 

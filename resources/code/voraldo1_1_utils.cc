@@ -513,7 +513,11 @@ void Voraldo::draw_everything()
     // show the demo window
     if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
+
+
+
     // get the data go the GPU
+    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());   // put imgui data into the framebuffer
 
