@@ -9,7 +9,7 @@ msg:
 		@date
 		@echo
 
-exe: resources/imgui/imgui.o resources/BigInt/*.o resources/code/lodepng.o resources/code/perlin.o voraldo1_1.o utils.o
+exe: resources/imgui/imgui.o resources/BigInt/*.o resources/code/lodepng.o resources/code/perlin.o voraldo1_1.o gpu_data.o utils.o
 		g++ -o exe resources/code/main.cc *.o resources/imgui/*.o resources/code/*.o resources/BigInt/*.o      ${FLAGS}
 
 resources/imgui/imgui.o: resources/imgui/*.cc

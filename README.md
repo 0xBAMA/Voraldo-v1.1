@@ -11,6 +11,7 @@ Some of the bigger things:
  - making the lighting buffer RGB, start looking at doing light with color associated with it
  - compass rose, to show block orientation (helps with positioning)
  - completely redoing the menu - add top menu bar, togglable overlay with fps + fps graph
+ - optimization idea: keep a bool that tells whether or not things need to be re-rendered via the raycast compute shader each frame, else just display existing texture
  - shape batching, like VIVS did - probably using SSBOs this time instead of uniform buffers
  - LUA scripting - using the same interface as the menu buttons do
  - change box blur to a gaussian kernel - weight color contribution by cell alpha

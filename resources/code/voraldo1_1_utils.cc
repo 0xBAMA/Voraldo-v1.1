@@ -157,61 +157,7 @@ void Voraldo::gl_setup()
     printf( "Renderer: %s\n", renderer );
     printf( "OpenGL version supported %s\n\n\n", version );
 
-    // create the shader for the triangles to cover the screen
-    display_shader = Shader("resources/code/shaders/blit.vs.glsl", "resources/code/shaders/blit.fs.glsl").Program;
-
-    // set up the points for the display
-    //  A---------------B
-    //  |          .    |
-    //  |       .       |
-    //  |    .          |
-    //  |               |
-    //  C---------------D
-
-    // diagonal runs from C to B
-    //  A is -1, 1
-    //  B is  1, 1
-    //  C is -1,-1
-    //  D is  1,-1
-    std::vector<glm::vec3> points;
-
-    points.clear();
-    points.push_back(glm::vec3(-1, 1, 0.5));  //A
-    points.push_back(glm::vec3(-1,-1, 0.5));  //C
-    points.push_back(glm::vec3( 1, 1, 0.5));  //B
-
-    points.push_back(glm::vec3( 1, 1, 0.5));  //B
-    points.push_back(glm::vec3(-1,-1, 0.5));  //C
-    points.push_back(glm::vec3( 1,-1, 0.5));  //D
-
-    // vao, vbo
-    cout << "  setting up vao, vbo for display geometry...........";
-    glGenVertexArrays( 1, &display_vao );
-    glBindVertexArray( display_vao );
-
-    glGenBuffers( 1, &display_vbo );
-    glBindBuffer( GL_ARRAY_BUFFER, display_vbo );
-    cout << "done." << endl;
-
-    // buffer the data
-    cout << "  buffering vertex data..............................";
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * points.size(), NULL, GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * points.size(), &points[0]);
-    cout << "done." << endl;
-
-    // set up attributes
-    cout << "  setting up attributes in display shader............";
-    GLuint points_attrib = glGetAttribLocation(display_shader, "vPosition");
-    glEnableVertexAttribArray(points_attrib);
-    glVertexAttribPointer(points_attrib, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*) (static_cast<const char*>(0) + (0)));
-    cout << "done." << endl;
-
-    // create the image textures
-
-    // compile the compute shader to do the raycasting
-
-    // ...
-
+    GPU_Data.init();
 }
 
 
@@ -482,16 +428,9 @@ void Voraldo::draw_everything()
 
 
     // draw the stuff on the GPU
+    GPU_Data.display();
 
 
-
-
-    // texture display
-    glUseProgram(display_shader);
-    glBindVertexArray( display_vao );
-    glBindBuffer( GL_ARRAY_BUFFER, display_vbo );
-
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
 
 
     // Start the Dear ImGui frame
