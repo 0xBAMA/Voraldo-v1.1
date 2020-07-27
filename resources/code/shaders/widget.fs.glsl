@@ -23,7 +23,7 @@ void main()
 
 	float diffuse = (1/(pow(0.25*distance(vpos,light_position),2))) * 0.3 * max(dot(n, l),0);
 
-	pixcol += diffuse*vec3(0.3,0.3,0.1);
+	pixcol += diffuse*vec3(0.39,0.39,0.18);
 
 	float specular = (1/(pow(0.25*distance(vpos,light_position),2))) * 1.0 * pow(max(dot(r,v),0),10);
 

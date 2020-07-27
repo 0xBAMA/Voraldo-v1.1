@@ -38,7 +38,7 @@ void main()
 	vpos = 0.2 * (rotphi * rottheta * vPosition);
 	
 	vpos.x /= ratio;
-	vpos += vec3(0.88, -0.68, 0.0);
+	vpos += vec3(0.875, -0.725, 0.0);
 
 	gl_Position = vec4(vpos, 1.0);
 }

@@ -7,8 +7,8 @@ void GLContainer::display_block()
     // ------------------------
     // compute shader raycasts, puts result into texture
 
-    // not neccesary if there has been no changes since the last frame -
-    //   changes include drawing, lighting, rotation, zooming
+    // Optimization idea: it is not neccesary to raycast if there has been no changes since the last frame -
+    //   these changes would include drawing, lighting, rotation, zooming...
 
 
     // ------------------------

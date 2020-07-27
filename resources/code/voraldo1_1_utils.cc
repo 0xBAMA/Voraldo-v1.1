@@ -3,6 +3,16 @@
 
 void Voraldo::create_window()
 {
+
+    cout << "   :::     ::: :::::::: :::::::::     :::    :::       :::::::::  :::::::: " << endl;
+    cout << "  :+:     :+::+:    :+::+:    :+:  :+: :+:  :+:       :+:    :+::+:    :+:" << endl;
+    cout << " +:+     +:++:+    +:++:+    +:+ +:+   +:+ +:+       +:+    +:++:+    +:+" << endl;
+    cout << "+#+     +:++#+    +:++#++:++#: +#++:++#++:+#+       +#+    +:++#+    +:+" << endl;
+    cout << "+#+   +#+ +#+    +#++#+    +#++#+     +#++#+       +#+    +#++#+    +#+" << endl;
+    cout << "#+#+#+#  #+#    #+##+#    #+##+#     #+##+#       #+#    #+##+#    #+#" << endl;
+    cout << " ###     ######## ###    ######     ######################  ######## " << endl;
+    cout << endl;
+
     if(SDL_Init( SDL_INIT_EVERYTHING ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -30,16 +40,10 @@ void Voraldo::create_window()
     int total_screen_width = dm.w;
     int total_screen_height = dm.h;
 
-    cout << "creating window...";
-
     // window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
     window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
     SDL_ShowWindow(window);
 
-    cout << "done." << endl;
-
-
-    cout << "setting up OpenGL context...";
     // OpenGL 4.3 + GLSL version 430
     const char* glsl_version = "#version 430";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
@@ -78,20 +82,14 @@ void Voraldo::create_window()
 
     clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 75.0f/255.0f, 0.5f); // initial value for clear color
 
-    // really excited by the fact imgui has an hsv picker to set this
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear( GL_COLOR_BUFFER_BIT );
     SDL_GL_SwapWindow( window );
 
-    cout << "done." << endl;
-
-
     #define FPS_HISTORY_SIZE 95
     fps_history.resize(FPS_HISTORY_SIZE);   //initialize the array of fps values
 
-
     ImVec4* colors = ImGui::GetStyle().Colors;
-
 
     colors[ImGuiCol_Text]                   = ImVec4(0.67f, 0.50f, 0.16f, 1.00f);
     colors[ImGuiCol_TextDisabled]           = ImVec4(0.33f, 0.27f, 0.16f, 1.00f);
@@ -142,7 +140,6 @@ void Voraldo::create_window()
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-
     ImGuiStyle& style = ImGui::GetStyle();
 
     style.FrameRounding = 2;
@@ -157,7 +154,7 @@ void Voraldo::gl_setup()
     printf( "Renderer: %s\n", renderer );
     printf( "OpenGL version supported %s\n\n\n", version );
 
-    GPU_Data.init();
+    GPU_Data.init(); // wrapper for all the GPU-side setup
 }
 
 
@@ -181,6 +178,8 @@ void Voraldo::HelpMarker(const char* desc)
 // small overlay to show the FPS counter, FPS graph
 void Voraldo::FPSOverlay(bool* p_open)
 {
+    if(*p_open)
+    {
     const float DISTANCE = 2.0f;
     static int corner = 3;
     ImGuiIO& io = ImGui::GetIO();
@@ -229,6 +228,7 @@ void Voraldo::FPSOverlay(bool* p_open)
         }
     }
     ImGui::End();
+    }
 }
 
 
@@ -330,6 +330,14 @@ void Voraldo::AppMainMenuBar()
             if (ImGui::MenuItem("Paste", "CTRL+V")) {}
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Display"))
+        {
+            if (ImGui::MenuItem("Show Controls", "    ")) {show_controls = !show_controls;}
+            if (ImGui::MenuItem("Show FPS Overlay", " ")) {show_fpsoverlay = !show_fpsoverlay;}
+            if (ImGui::MenuItem("Show Orientation", " ")) {GPU_Data.show_widget = !GPU_Data.show_widget;}
+            if (ImGui::MenuItem("Show Demo Window", " ")) {show_demo_window = !show_demo_window;}
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }
@@ -337,6 +345,8 @@ void Voraldo::AppMainMenuBar()
 
 void Voraldo::ControlWindow(bool *open)
 {
+    if(*open)
+    {
     ImGuiWindowFlags flags = 0;
 
     ImGui::SetNextWindowPos(ImVec2(0,19));
@@ -406,11 +416,11 @@ void Voraldo::ControlWindow(bool *open)
 
    ImGui::End();
 }
+}
 
 void Voraldo::draw_everything()
 {
     ImGuiIO& io = ImGui::GetIO(); // void cast prevents unused variable warning
-    //get the screen dimensions and pass in as uniforms
 
   //maintaining history of fps values
   //push back - put in the new value
@@ -419,19 +429,11 @@ void Voraldo::draw_everything()
   //pop front - take out the oldest value
     fps_history.pop_front();
 
-
-
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the background
 
-
-
-
     // draw the stuff on the GPU
     GPU_Data.display();
-
-
-
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -451,8 +453,6 @@ void Voraldo::draw_everything()
 
     // show the demo window
     if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
-
-
 
 
     // get the data go the GPU
@@ -492,17 +492,15 @@ void Voraldo::draw_everything()
             GPU_Data.scale -= 0.1f;     //make scale larger  (offsets are smaller)
 
 
-        constexpr double pi = 3.14159265358979323846;
-
         // specific directions
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)
             GPU_Data.theta = 0.0;
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F2)
             GPU_Data.theta = pi/2.0;
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F3)
-            GPU_Data.theta = 3.0*(pi/2.0);
-        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F4)
             GPU_Data.theta = pi;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F4)
+            GPU_Data.theta = 3.0*(pi/2.0);
 
 
         if(event.type == SDL_MOUSEWHEEL)  //allow scroll to do the same thing as +/-

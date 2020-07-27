@@ -15,27 +15,20 @@ class Voraldo
 		SDL_Window * window;
 		SDL_GLContext GLcontext;
 
-
 		ImVec4 clear_color;
-
-
-
 		GLContainer GPU_Data;
-
-
 
 		std::deque<float> fps_history;
 
-		bool show_fpsoverlay = true;
-		bool show_demo_window = true;
-		bool show_controls = true;
+		bool show_fpsoverlay  = true;
+		bool show_controls    = true;
+		bool show_demo_window = false;
 
 		void ControlWindow(bool *open);
 		void AppMainMenuBar();
 		void ShowExampleMenuFile();
 		void FPSOverlay(bool* p_open);
 		void HelpMarker(const char* desc);
-
 
 		void create_window();
 		void gl_setup();
@@ -44,7 +37,6 @@ class Voraldo
 		void quit();
 
 		bool pquit;
-
 };
 
 #endif

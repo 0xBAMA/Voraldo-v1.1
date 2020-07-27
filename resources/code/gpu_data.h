@@ -15,7 +15,8 @@ class GLContainer
         void init() { compile_shaders(); buffer_geometry(); load_textures(); }
 
         // display function
-        void display() { display_block(); display_orientation_widget(); }
+        bool show_widget = true;
+        void display() { display_block(); if(show_widget) display_orientation_widget(); }
 
         // manipulating the block
         void swap_blocks();
