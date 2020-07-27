@@ -8,8 +8,8 @@ out vec4 fragment_output;
 
 void main()
 {
-	vec3 light_position = vec3(1,-2,0);
-	vec3 eye_position = vec3(0,0,-2);
+	vec3 light_position = vec3(-2,-1,-0.45);
+	vec3 eye_position = vec3(0,0,-1);
 	
 	vec3 l = normalize(vpos - light_position);
 	vec3 v = normalize(vpos - eye_position);
@@ -25,10 +25,10 @@ void main()
 
 	pixcol += diffuse*vec3(0.3,0.3,0.1);
 
-	float specular = (1/(pow(0.25*distance(vpos,light_position),2))) * 1.0 * pow(max(dot(r,v),0),100);
+	float specular = (1/(pow(0.25*distance(vpos,light_position),2))) * 1.0 * pow(max(dot(r,v),0),10);
 
 	if(dot(n,l) > 0)
-		pixcol += specular*vec3(1,1.4,0);
+		pixcol += specular*vec3(0.1,0.12,0);
 
 	fragment_output = vec4(pixcol, 1);
 }

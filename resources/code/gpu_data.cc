@@ -7,6 +7,9 @@ void GLContainer::display_block()
     // ------------------------
     // compute shader raycasts, puts result into texture
 
+    // not neccesary if there has been no changes since the last frame -
+    //   changes include drawing, lighting, rotation, zooming
+
 
     // ------------------------
     // display shader takes texture and puts it on the screen
@@ -18,18 +21,6 @@ void GLContainer::display_block()
     // two triangles, 6 verticies
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 
-
-    glUseProgram( orientation_widget_shader );
-    glBindVertexArray( orientation_widget_vao );
-    glBindBuffer( GL_ARRAY_BUFFER, orientation_widget_vbo );
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    glUniform1f(glGetUniformLocation(orientation_widget_shader, "time"), 0.001*SDL_GetTicks());
-    glUniform1f(glGetUniformLocation(orientation_widget_shader, "ratio"), io.DisplaySize.x/io.DisplaySize.y);
-
-    // 4 cubes, 6 faces apiece, 2 triangles per face - total is 144 verticies
-    glDrawArrays( GL_TRIANGLES, 0, 144);
 }
 
 void GLContainer::display_orientation_widget()
@@ -41,7 +32,20 @@ void GLContainer::display_orientation_widget()
     //  are once you have rotated around a bit - by using this widget,
     //  I hope to aleviate this as an issue to some extent.
 
+    glUseProgram( orientation_widget_shader );
+    glBindVertexArray( orientation_widget_vao );
+    glBindBuffer( GL_ARRAY_BUFFER, orientation_widget_vbo );
 
+    ImGuiIO& io = ImGui::GetIO();
+
+    // glUniform1f(glGetUniformLocation(orientation_widget_shader, "time"), 0.001*SDL_GetTicks());
+    glUniform1f(glGetUniformLocation(orientation_widget_shader, "theta"), theta);
+    glUniform1f(glGetUniformLocation(orientation_widget_shader, "phi"), phi);
+    glUniform1f(glGetUniformLocation(orientation_widget_shader, "ratio"), io.DisplaySize.x/io.DisplaySize.y);
+
+    // 4 cubes, 6 faces apiece, 2 triangles per face - total is 144 verticies
+    glDrawArrays( GL_TRIANGLES, 0, 144);
+   
 }
 
 

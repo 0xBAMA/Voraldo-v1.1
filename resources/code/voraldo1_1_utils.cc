@@ -409,7 +409,7 @@ void Voraldo::ControlWindow(bool *open)
 
 void Voraldo::draw_everything()
 {
-    ImGuiIO& io = ImGui::GetIO(); (void)io; // void cast prevents unused variable warning
+    ImGuiIO& io = ImGui::GetIO(); // void cast prevents unused variable warning
     //get the screen dimensions and pass in as uniforms
 
   //maintaining history of fps values
@@ -477,6 +477,45 @@ void Voraldo::draw_everything()
 
         if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
             pquit = true;
+
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_UP)
+            GPU_Data.phi  += 0.03f;     //increment phi
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_DOWN)
+            GPU_Data.phi  -= 0.03f;     //decrement phi
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_LEFT)
+            GPU_Data.theta += 0.03f;    //increment theta
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_RIGHT)
+            GPU_Data.theta -= 0.03f;    //decrement theta
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_MINUS)
+            GPU_Data.scale += 0.1f;     //make scale smaller (offsets are larger)
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_EQUALS) //SDLK_PLUS requires that you hit the shift
+            GPU_Data.scale -= 0.1f;     //make scale larger  (offsets are smaller)
+
+
+        constexpr double pi = 3.14159265358979323846;
+
+        // specific directions
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)
+            GPU_Data.theta = 0.0;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F2)
+            GPU_Data.theta = pi/2.0;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F3)
+            GPU_Data.theta = 3.0*(pi/2.0);
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F4)
+            GPU_Data.theta = pi;
+
+
+        if(event.type == SDL_MOUSEWHEEL)  //allow scroll to do the same thing as +/-
+        {
+            if(event.wheel.y > 0) // scroll up
+            {
+                GPU_Data.scale -= 0.1f;
+            }
+            else if(event.wheel.y < 0) // scroll down
+            {
+                GPU_Data.scale += 0.1f;
+            }
+        }
     }
 }
 

@@ -8,7 +8,8 @@ out vec3 normal;
 out vec3 color;
 out vec3 vpos;
 
-uniform float time;
+uniform float theta;
+uniform float phi;
 uniform float ratio;
 
 //thanks to Neil Mendoza via http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
@@ -28,11 +29,13 @@ mat3 rotationMatrix(vec3 axis, float angle)
 void main()
 {
 
-	mat3 rot = rotationMatrix(vec3(0,1,0), time) * rotationMatrix(vec3(1,0,0), time*0.2);
+	mat3 rotphi = rotationMatrix(vec3(1,0,0), -1.0*phi);
+	
+	mat3 rottheta = rotationMatrix(vec3(0,1,0), -1.0*theta);
 
-	normal = rot * vNormal;
+	normal = rotphi * rottheta * vNormal;
 	color = vColor;
-	vpos = 0.2*(rot*vPosition);
+	vpos = 0.2 * (rotphi * rottheta * vPosition);
 	
 	vpos.x /= ratio;
 	vpos += vec3(0.88, -0.68, 0.0);
