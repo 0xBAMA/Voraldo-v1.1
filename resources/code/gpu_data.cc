@@ -23,7 +23,10 @@ void GLContainer::display_block()
     glBindVertexArray( orientation_widget_vao );
     glBindBuffer( GL_ARRAY_BUFFER, orientation_widget_vbo );
 
+    ImGuiIO& io = ImGui::GetIO();
+
     glUniform1f(glGetUniformLocation(orientation_widget_shader, "time"), 0.001*SDL_GetTicks());
+    glUniform1f(glGetUniformLocation(orientation_widget_shader, "ratio"), io.DisplaySize.x/io.DisplaySize.y);
 
     // 4 cubes, 6 faces apiece, 2 triangles per face - total is 144 verticies
     glDrawArrays( GL_TRIANGLES, 0, 144);

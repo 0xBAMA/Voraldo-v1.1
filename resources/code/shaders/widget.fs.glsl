@@ -2,10 +2,33 @@
 
 in vec3 normal;
 in vec3 color;
+in vec3 vpos;
 
 out vec4 fragment_output;
 
 void main()
 {
-	fragment_output = vec4(color, 1);
+	vec3 light_position = vec3(1,-2,0);
+	vec3 eye_position = vec3(0,0,-2);
+	
+	vec3 l = normalize(vpos - light_position);
+	vec3 v = normalize(vpos - eye_position);
+	vec3 n = normalize(normal);
+	vec3 r = normalize(reflect(l, n));
+
+	vec3 pixcol = color;
+	
+	float ambient = 0.08;
+	pixcol += ambient*vec3(0.1,0.1,0.2);
+
+	float diffuse = (1/(pow(0.25*distance(vpos,light_position),2))) * 0.3 * max(dot(n, l),0);
+
+	pixcol += diffuse*vec3(0.3,0.3,0.1);
+
+	float specular = (1/(pow(0.25*distance(vpos,light_position),2))) * 1.0 * pow(max(dot(r,v),0),100);
+
+	if(dot(n,l) > 0)
+		pixcol += specular*vec3(1,1.4,0);
+
+	fragment_output = vec4(pixcol, 1);
 }
