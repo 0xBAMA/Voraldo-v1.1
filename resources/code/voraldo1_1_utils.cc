@@ -332,10 +332,10 @@ void Voraldo::AppMainMenuBar()
         }
         if (ImGui::BeginMenu("Display"))
         {
-            if (ImGui::MenuItem("Show Controls", "    ")) {show_controls = !show_controls;}
-            if (ImGui::MenuItem("Show FPS Overlay", " ")) {show_fpsoverlay = !show_fpsoverlay;}
-            if (ImGui::MenuItem("Show Orientation", " ")) {GPU_Data.show_widget = !GPU_Data.show_widget;}
-            if (ImGui::MenuItem("Show Demo Window", " ")) {show_demo_window = !show_demo_window;}
+            if (ImGui::MenuItem("Show FPS Overlay", NULL, show_fpsoverlay)) {show_fpsoverlay = !show_fpsoverlay;}
+            if (ImGui::MenuItem("Show Orientation", NULL, GPU_Data.show_widget)) {GPU_Data.show_widget = !GPU_Data.show_widget;}
+            if (ImGui::MenuItem("Show Controls", NULL, show_controls)) {show_controls = !show_controls;}
+            if (ImGui::MenuItem("Show Demo Window", NULL, show_demo_window)) {show_demo_window = !show_demo_window;}
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -380,34 +380,6 @@ void Voraldo::ControlWindow(bool *open)
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Instructions1"))
-        {
-            ImGui::Separator();
-            ImGui::Text(" ");
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Instructions2"))
-        {
-            ImGui::Separator();
-            ImGui::Text(" ");
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Instructions3"))
-        {
-            ImGui::Separator();
-            ImGui::Text(" ");
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Instructions4"))
-        {
-            ImGui::Separator();
-            ImGui::Text(" ");
-            ImGui::EndTabItem();
-        }
-
         ImGui::EndTabBar();
     }
 
@@ -430,9 +402,9 @@ void Voraldo::draw_everything()
     fps_history.pop_front();
 
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the background
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the screen
 
-    // draw the stuff on the GPU
+    // draw the stuff on the GPU (block and orientation widget)
     GPU_Data.display();
 
     // Start the Dear ImGui frame

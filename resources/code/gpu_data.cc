@@ -52,15 +52,13 @@ void GLContainer::display_orientation_widget()
 // ------------------------
 // ------------------------
 // initialization functions
-void GLContainer::compile_shaders()
+void GLContainer::compile_shaders() // going to make this more compact this time around
 {
     // ------------------------
     // compiling display shaders
 
-
-    // display_compute_shader = CShader("...");
-
-    display_shader = Shader("resources/code/shaders/blit.vs.glsl", "resources/code/shaders/blit.fs.glsl").Program;
+    display_compute_shader    = CShader("resources/code/shaders/raycast.cs.glsl").Program;
+    display_shader            = Shader("resources/code/shaders/blit.vs.glsl", "resources/code/shaders/blit.fs.glsl").Program;
     orientation_widget_shader = Shader("resources/code/shaders/widget.vs.glsl", "resources/code/shaders/widget.fs.glsl").Program;
 
     // ------------------------
@@ -72,7 +70,7 @@ void GLContainer::compile_shaders()
 void GLContainer::buffer_geometry()
 {
     // ------------------------
-    // display geometry, two triangles, just to get a screen full of fragments
+    // display geometry, two triangles, just to get a screen's worth of fragments
 
     //  A---------------B
     //  |          .    |
@@ -332,6 +330,23 @@ void GLContainer::load_textures()
     // for v1.1, I am planning out the locations of all textures at the
     //  beginning of the project - I hope to keep a consistent environment
     //  across all the shaders, to make it easier to understand and extend
+
+    // The texture breakdown is as follows:
+    //  0  - main block render texture
+    //  1  - copy/paste buffer's render texture
+    //  2  - main block front color buffer
+    //  3  - main block back color buffer
+    //  4  - main block front mask buffer
+    //  5  - main block back mask buffer
+    //  6  - display lighting buffer
+    //  7  - lighting cache buffer
+    //  8  - copy/paste front buffer
+    //  9  - copy/paste back buffer
+    //  10 - load buffer (used for load, VAT)
+    //  11 - perlin noise
+    //  12 - heightmap
+
+
 
 }
 
