@@ -328,29 +328,110 @@ void GLContainer::load_textures()
 {
     // ------------------------
     // for v1.1, I am planning out the locations of all textures at the
-    //  beginning of the project - I hope to keep a consistent environment
+    //  beginning of the project - I hope to keep a more consistent environment
     //  across all the shaders, to make it easier to understand and extend
 
-    // The texture breakdown is as follows:
-    //  0  - main block render texture
-    //  1  - copy/paste buffer's render texture
-    //  2  - main block front color buffer
-    //  3  - main block back color buffer
-    //  4  - main block front mask buffer
-    //  5  - main block back mask buffer
-    //  6  - display lighting buffer
-    //  7  - lighting cache buffer
-    //  8  - copy/paste front buffer
-    //  9  - copy/paste back buffer
-    //  10 - load buffer (used for load, Voxel Automata Terrain)
-    //  11 - perlin noise
-    //  12 - heightmap
+    // see gpu_data.h for the numbered listing
+
+    // data arrays
+    std::vector<unsigned char> ucxor, light, zeroes;
+
+    for(unsigned int x = 0; x < DIM; x++)
+        for(unsigned int y = 0; y < DIM; y++)
+            for(unsigned int z = 0; z < DIM; z++)
+            {
+                for(int i = 0; i < 3; i++) // fill r, g, b with the result of the xor
+                    ucxor.push_back(((unsigned char)(x%256) ^ (unsigned char)(y%256) ^ (unsigned char)(z%256)));
+
+                ucxor.push_back(255); // alpha channel gets 255
+            }
+
+    light.resize(3*DIM*DIM*DIM, 64); // fill the array with '64'
+    zeroes.resize(3*DIM*DIM*DIM, 0); // fill the array with zeroes
+
 
     // create all the texture handles
     glGenTextures(13, &textures[0]);
 
 
+    // main render texture - this is going to be a rectangular texture, larger than the screen so we can do some supersampling
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
 
+
+    // copy/paste buffer render texture - this is going to be a small rectangular texture, will only be shown inside the menus
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+
+
+    // main block front color buffer - initialize with xor
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_3D, textures[2]);
+
+
+    // main block back color buffer - initially empty
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_3D, textures[3]);
+
+
+    // main block front mask buffer - initially empty
+    glActiveTexture(GL_TEXTURE0 + 4);
+    glBindTexture(GL_TEXTURE_3D, textures[4]);
+
+
+    // main block back mask buffer - initially empty
+    glActiveTexture(GL_TEXTURE0 + 5);
+    glBindTexture(GL_TEXTURE_3D, textures[5]);
+
+
+    // display lighting buffer - initialize with some base value representing neutral coloration
+    glActiveTexture(GL_TEXTURE0 + 6);
+    glBindTexture(GL_TEXTURE_3D, textures[6]);
+
+
+    // lighting cache buffer - this is going to have the same data in it as the regular lighting buffer initially
+    glActiveTexture(GL_TEXTURE0 + 7);
+    glBindTexture(GL_TEXTURE_3D, textures[7]);
+
+
+    // copy/paste front buffer - initally empty
+    glActiveTexture(GL_TEXTURE0 + 8);
+    glBindTexture(GL_TEXTURE_3D, textures[8]);
+
+
+    // copy/paste back buffer - initially empty
+    glActiveTexture(GL_TEXTURE0 + 9);
+    glBindTexture(GL_TEXTURE_3D, textures[9]);
+
+
+    // load buffer - initially empty
+    glActiveTexture(GL_TEXTURE0 + 10);
+    glBindTexture(GL_TEXTURE_3D, textures[10]);
+
+
+    // perlin noise - initialize with noise at some default scaling
+    glActiveTexture(GL_TEXTURE0 + 11);
+    glBindTexture(GL_TEXTURE_3D, textures[11]);
+
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
+    //3d texture for perlin noise - DIM on a side
+    // generate_perlin_noise(0.014, 0.04, 0.014);
+
+
+    // heightmap - initialize with a generated diamond square heightmap
+    glActiveTexture(GL_TEXTURE0 + 12);
+    glBindTexture(GL_TEXTURE_2D, textures[12]);
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    //2d texture for representation of a heightmap (greyscale - use some channels to hold more data?) - also, DIM on a side
+    // generate_heightmap_diamond_square();
 }
 
 

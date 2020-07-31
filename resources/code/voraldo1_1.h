@@ -15,6 +15,9 @@ class Voraldo
 		SDL_Window * window;
 		SDL_GLContext GLcontext;
 
+		int total_screen_width;
+		int total_screen_height;
+
 		ImVec4 clear_color;
 		GLContainer GPU_Data;
 
