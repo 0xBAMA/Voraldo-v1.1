@@ -342,9 +342,12 @@ void GLContainer::load_textures()
     //  7  - lighting cache buffer
     //  8  - copy/paste front buffer
     //  9  - copy/paste back buffer
-    //  10 - load buffer (used for load, VAT)
+    //  10 - load buffer (used for load, Voxel Automata Terrain)
     //  11 - perlin noise
     //  12 - heightmap
+
+    // create all the texture handles
+    glGenTextures(13, &textures[0]);
 
 
 
@@ -356,21 +359,51 @@ void GLContainer::load_textures()
 // manipulating the block
 void GLContainer::swap_blocks()
 {
-
+    std::swap(textures[2], textures[3]); // swap color buffers
+    std::swap(textures[4], textures[5]); // swap mask buffers
 }
 
 // ------------------------
-// shapes
+// Shapes
 
+   // aabb
+   // sphere
+   // cylinder
+   // tube
+   // cuboid
+   // triangle
+   // grid
+   // ellipsoid
+   // heightmap
+   // perlin noise
 
 // ------------------------
 // GPU-side utilities
 
+   // clear all
+   // unmask all
+   // invert mask
+   // mask by color
+   // blur
+   // shifting
+
 
 // ------------------------
-// lighting
+// Lighting
+
+   // lighting clear (to cached level)
+   // directional
+   // ambient occlusion
+   // fake GI
+   // mash (combine light into color buffer)
 
 
 // ------------------------
 // ------------------------
 // CPU-side utilities
+
+   // functions to generate new heightmaps
+   // function to generate new block of 3d perlin noise
+   // Brent Werness's Voxel Automata Terrain
+   // load
+   // save

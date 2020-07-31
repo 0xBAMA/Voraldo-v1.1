@@ -21,17 +21,51 @@ class GLContainer
         // manipulating the block
         void swap_blocks();
 
-          // shapes
+          // Shapes
+                // aabb
+                // sphere
+                // cylinder
+                // tube
+                // cuboid
+                // triangle
+                // grid
+                // ellipsoid
+                // heightmap
+                // perlin noise
 
           // GPU-side utilities
+                // clear all
+                // unmask all
+                // invert mask
+                // mask by color
+                // blur
+                // shifting
 
-          // lighting
-
+          // Lighting
+                // lighting clear (to cached level)
+                // directional
+                // ambient occlusion
+                // fake GI
+                // mash (combine light into color buffer)
 
         // CPU-side utilities
+                // functions to generate new heightmaps
+        void generate_heightmap_diamond_square();
+        void generate_heightmap_perlin();
+        void generate_heightmap_XOR();
+
+                // generate 3d perlin noise
+        void generate_perlin_noise(float xscale, float yscale, float zscale);
+
+                // Brent Werness's Voxel Automata Terrain
+        std::string vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag);
+
+                // load
+
+                // save
 
 
-        // base color
+        // OpenGL clear color
         glm::vec4 clear_color;
 
         // display parameters - public so they can be manipulated
@@ -48,9 +82,13 @@ class GLContainer
         void buffer_geometry();
         void load_textures();
 
+        // helper function for buffer_geometry (used to generate the orientation widget)
         void cube_geometry(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, glm::vec3 e, glm::vec3 f, glm::vec3 g, glm::vec3 h, std::vector<glm::vec3> &points, std::vector<glm::vec3> &normals, std::vector<glm::vec3> &colors, glm::vec3 color);
 
-        // shows the texture containing the rendered block
+        // all the textures
+        GLuint textures[13];
+
+        // shows the texture containing the rendered block - workgroup is 32x32x1
         GLuint display_compute_shader;   // raycast -> texture
         GLuint display_shader;           // texture -> window
         GLuint display_vao;
@@ -62,7 +100,8 @@ class GLContainer
         GLuint orientation_widget_vbo;
 
         // compute shaders
-        //  ...
+        // GLuint ...
+
 };
 
 #endif
