@@ -334,7 +334,10 @@ void GLContainer::load_textures()
     // see gpu_data.h for the numbered listing
 
     // data arrays
-    std::vector<unsigned char> ucxor, light, zeroes;
+    std::vector<unsigned char> ucxor, light, zeroes, random;
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<unsigned char> distribution(0,255);
 
     for(unsigned int x = 0; x < DIM; x++)
         for(unsigned int y = 0; y < DIM; y++)
@@ -344,11 +347,15 @@ void GLContainer::load_textures()
                     ucxor.push_back(((unsigned char)(x%256) ^ (unsigned char)(y%256) ^ (unsigned char)(z%256)));
 
                 ucxor.push_back(255); // alpha channel gets 255
+
+                random.push_back(distribution(generator));
             }
+
+    #define SSFACTOR 2
 
     light.resize(3*DIM*DIM*DIM, 64); // fill the array with '64'
     zeroes.resize(3*DIM*DIM*DIM, 0); // fill the array with zeroes
-
+    random.resize(screen_width*SSFACTOR*screen_width*SSFACTOR*2);
 
     // create all the texture handles
     glGenTextures(13, &textures[0]);
@@ -356,22 +363,33 @@ void GLContainer::load_textures()
 
     // main render texture - this is going to be a rectangular texture, larger than the screen so we can do some supersampling
     glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBindTexture(GL_TEXTURE_RECTANGLE, textures[0]);
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA16, screen_width*SSFACTOR, screen_height*SSFACTOR, 0, GL_RGBA, GL_UNSIGNED_BYTE, &random[0]);
+    glBindImageTexture(0, textures[0], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA16);
+    //set up filtering for this texture
+    glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
+   
     // copy/paste buffer render texture - this is going to be a small rectangular texture, will only be shown inside the menus
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, 512, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(1, textures[1], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA16);
 
 
     // main block front color buffer - initialize with xor
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_3D, textures[2]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &ucxor[0]);
+    glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
     // main block back color buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 3);
     glBindTexture(GL_TEXTURE_3D, textures[3]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
     // main block front mask buffer - initially empty

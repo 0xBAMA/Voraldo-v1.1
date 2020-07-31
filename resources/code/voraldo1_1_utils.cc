@@ -154,10 +154,10 @@ void Voraldo::gl_setup()
     printf( "Renderer: %s\n", renderer );
     printf( "OpenGL version supported %s\n\n\n", version );
 
-    GPU_Data.init(); // wrapper for all the GPU-side setup
-
     GPU_Data.screen_width = total_screen_width;
     GPU_Data.screen_height = total_screen_height;
+
+    GPU_Data.init(); // wrapper for all the GPU-side setup
 }
 
 
