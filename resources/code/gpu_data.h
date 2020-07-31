@@ -83,7 +83,7 @@ class GLContainer
         // display parameters - public so they can be manipulated
         float scale = 5.0f, theta = 0.0f, phi = 0.0f;
 
-        int screen_width, screen_height;
+        unsigned int screen_width, screen_height;
 
     private:
 

@@ -2,12 +2,11 @@
 
 in vec2 v_pos;
 
-// need to set up sampler for main display texture
+// sampler for main display texture
 uniform sampler2DRect main_display_texture;
 
-// need to use this to get sampler
-uniform float x_res;	
-uniform float y_res;
+// supersampling factor, defined in includes.h
+uniform float ssfactor;
 
 out vec4 fragment_output;
 
@@ -18,5 +17,5 @@ void main()
 	// else
 	// 	discard;
 	
-	fragment_output = texture(main_display_texture, gl_FragCoord.xy);
+	fragment_output = texture(main_display_texture, ssfactor*gl_FragCoord.xy);
 }

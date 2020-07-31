@@ -73,14 +73,17 @@ using std::endl;
 // contains the OpenGL wrapper class
 #include "gpu_data.h"
 
+
 // pi definition
 constexpr double pi = 3.14159265358979323846;
 
+// supersampling factor for main display shader
+#define SSFACTOR 1.5
 
-//this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
+// this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
 #define DIM 256
 
-//this is effectively the shadowmap dimension - probaby want to reduce this eventually
+// this is effectively the shadowmap dimension - probaby want to reduce this eventually
 #define LIGHT_DIM 2048
 
 

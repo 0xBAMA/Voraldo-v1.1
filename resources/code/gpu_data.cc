@@ -18,6 +18,8 @@ void GLContainer::display_block()
     glBindVertexArray( display_vao );
     glBindBuffer( GL_ARRAY_BUFFER, display_vbo );
 
+    glUniform1f(glGetUniformLocation(display_shader, "ssfactor"), SSFACTOR);
+
     // two triangles, 6 verticies
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 
@@ -347,15 +349,22 @@ void GLContainer::load_textures()
                     ucxor.push_back(((unsigned char)(x%256) ^ (unsigned char)(y%256) ^ (unsigned char)(z%256)));
 
                 ucxor.push_back(255); // alpha channel gets 255
-
-                random.push_back(distribution(generator));
             }
 
-    #define SSFACTOR 2
+
+    for(unsigned int x = 0; x <= (screen_width*SSFACTOR); x++)
+        for(unsigned int y = 0; y <= (screen_height*SSFACTOR); y++)
+        {
+            random.push_back(distribution(generator));
+            random.push_back(distribution(generator));
+            random.push_back(distribution(generator));
+            random.push_back(distribution(generator));
+        }
+
 
     light.resize(3*DIM*DIM*DIM, 64); // fill the array with '64'
     zeroes.resize(3*DIM*DIM*DIM, 0); // fill the array with zeroes
-    random.resize(screen_width*SSFACTOR*screen_width*SSFACTOR*2);
+
 
     // create all the texture handles
     glGenTextures(13, &textures[0]);
@@ -365,8 +374,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_RECTANGLE, textures[0]);
     glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA16, screen_width*SSFACTOR, screen_height*SSFACTOR, 0, GL_RGBA, GL_UNSIGNED_BYTE, &random[0]);
-    glBindImageTexture(0, textures[0], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA16);
-    //set up filtering for this texture
+    glBindImageTexture(0, textures[0], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA16); // 16 bits, hopefully higher precision is helpful
+    // set up filtering for this texture
     glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -395,36 +404,50 @@ void GLContainer::load_textures()
     // main block front mask buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 4);
     glBindTexture(GL_TEXTURE_3D, textures[4]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(4, textures[4], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
     // main block back mask buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 5);
     glBindTexture(GL_TEXTURE_3D, textures[5]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
     // display lighting buffer - initialize with some base value representing neutral coloration
     glActiveTexture(GL_TEXTURE0 + 6);
     glBindTexture(GL_TEXTURE_3D, textures[6]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, &light[0]);
+    glBindImageTexture(6, textures[6], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
     // lighting cache buffer - this is going to have the same data in it as the regular lighting buffer initially
     glActiveTexture(GL_TEXTURE0 + 7);
     glBindTexture(GL_TEXTURE_3D, textures[7]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, &light[0]);
+    glBindImageTexture(7, textures[7], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
     // copy/paste front buffer - initally empty
     glActiveTexture(GL_TEXTURE0 + 8);
     glBindTexture(GL_TEXTURE_3D, textures[8]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(8, textures[8], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
     // copy/paste back buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 9);
     glBindTexture(GL_TEXTURE_3D, textures[9]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(9, textures[9], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
     // load buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 10);
     glBindTexture(GL_TEXTURE_3D, textures[10]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindImageTexture(10, textures[10], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
     // perlin noise - initialize with noise at some default scaling
