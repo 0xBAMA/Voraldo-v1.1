@@ -78,8 +78,10 @@ using std::endl;
 constexpr double pi = 3.14159265358979323846;
 
 // supersampling factor for main display shader
-#define SSFACTOR 1.0 // no scaling
-#define TILESIZE 256 // for tile-based rendering, should be multiple of 32
+#define SSFACTOR 1.0
+
+// for the tile based rendering - needs to be a multiple of 32
+#define TILESIZE 256
 
 // this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
 #define DIM 256

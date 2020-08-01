@@ -40,8 +40,8 @@ void Voraldo::create_window()
     total_screen_width = dm.w;
     total_screen_height = dm.h;
 
-    // window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
-    window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
+    window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
+    // window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
 
     // OpenGL 4.3 + GLSL version 430
     const char* glsl_version = "#version 430";
@@ -340,6 +340,13 @@ void Voraldo::AppMainMenuBar()
             if (ImGui::MenuItem("Show Orientation", NULL, GPU_Data.show_widget)) {GPU_Data.show_widget = !GPU_Data.show_widget;}
             if (ImGui::MenuItem("Show Controls", NULL, show_controls)) {show_controls = !show_controls;}
             if (ImGui::MenuItem("Show Demo Window", NULL, show_demo_window)) {show_demo_window = !show_demo_window;}
+            if (ImGui::BeginMenu("Show on Display"))
+            {
+                if (ImGui::MenuItem("Display 0")) {SDL_SetWindowPosition(window, 0, 0);}
+                if (ImGui::MenuItem("Display 1")) {SDL_SetWindowPosition(window, total_screen_width, 0);}
+                if (ImGui::MenuItem("Display 2")) {SDL_SetWindowPosition(window, 2*total_screen_width, 0);}
+                ImGui::EndMenu();
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
