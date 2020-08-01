@@ -17,7 +17,7 @@ void GLContainer::display_block()
 
         // display texture
         glUniform1i(glGetUniformLocation(display_compute_shader, "current"), 0);
-        glUniform1i(glGetUniformLocation(display_compute_shader, "block"),   2);
+        glUniform1i(glGetUniformLocation(display_compute_shader, "block"),   2 + tex_offset);
 
         // rotation parameters
         glUniform1f(glGetUniformLocation(display_compute_shader, "theta"), theta);
@@ -548,15 +548,18 @@ void GLContainer::load_textures()
 // manipulating the block
 void GLContainer::swap_blocks()
 {
-    std::swap(textures[2], textures[3]); // swap color buffers
-    std::swap(textures[4], textures[5]); // swap mask buffers
+    // std::swap(textures[2], textures[3]); // swap color buffers
+    // std::swap(textures[4], textures[5]); // swap mask buffers
 
-    // update bindings
-    glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
-    glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
+    // // update bindings
+    // glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
+    // glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
-    glBindImageTexture(4, textures[4], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
-    glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
+    // glBindImageTexture(4, textures[4], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
+    // glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
+
+    // keep the data from moving
+    tex_offset = tex_offset ? 0 : 1;
 }
 
 // ------------------------

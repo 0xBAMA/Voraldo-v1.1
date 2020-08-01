@@ -129,6 +129,7 @@ class GLContainer
     private:
 
         bool redraw_flag = true;
+        int tex_offset = 0;
 
         // display helper functions
         void display_block();
