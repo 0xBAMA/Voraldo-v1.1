@@ -459,8 +459,8 @@ void GLContainer::load_textures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
-    //3d texture for perlin noise - DIM on a side
-    // generate_perlin_noise(0.014, 0.04, 0.014);
+    // 3d texture for perlin noise - DIM on a side
+    generate_perlin_noise(0.014, 0.04, 0.014);
 
 
     // heightmap - initialize with a generated diamond square heightmap
@@ -471,8 +471,8 @@ void GLContainer::load_textures()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    //2d texture for representation of a heightmap (greyscale - use some channels to hold more data?) - also, DIM on a side
-    // generate_heightmap_diamond_square();
+    // 2d texture for representation of a heightmap (greyscale - use some channels to hold more data?) - also, DIM on a side
+    generate_heightmap_diamond_square();
 }
 
 
@@ -525,7 +525,134 @@ void GLContainer::swap_blocks()
 // CPU-side utilities
 
    // functions to generate new heightmaps
+void GLContainer::generate_heightmap_diamond_square()
+{
+    long unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+    std::default_random_engine engine{seed};
+    std::uniform_real_distribution<float> distribution{0, 1};
+
+    constexpr auto size =  DIM + 1;
+    constexpr auto edge = size - 1;
+
+    uint8_t map[size][size] = {{0}};
+    map[0][0] = map[edge][0] = map[0][edge] = map[edge][edge] = 128;
+
+    heightfield::diamond_square_no_wrap(
+        size,
+        // random
+        [&engine, &distribution](float range)
+        {
+            return distribution(engine) * range;
+        },
+        // variance
+        [](int level) -> float
+        {
+            return 64.0f * std::pow(0.5f, level);
+        },
+        // at
+        [&map](int x, int y) -> uint8_t&
+        {
+            return map[y][x];
+        }
+    );
+
+    std::vector<unsigned char> data;
+
+    for(int x = 0; x < DIM; x++)
+    {
+        for(int y = 0; y < DIM; y++)
+        {
+            data.push_back(map[x][y]);
+            data.push_back(map[x][y]);
+            data.push_back(map[x][y]);
+            data.push_back(255);
+        }
+    }
+
+    //send it to the GPU
+    glBindTexture(GL_TEXTURE_2D, textures[12]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, DIM, DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void GLContainer::generate_heightmap_perlin()
+{
+    std::vector<unsigned char> data;
+
+    PerlinNoise p;
+
+    float xscale = 0.014f;
+    float yscale = 0.04f;
+
+    //might add more parameters at some point
+
+    static float offset = 0;
+
+    for(int x = 0; x < DIM; x++)
+    {
+        for(int y = 0; y < DIM; y++)
+        {
+            data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,offset) * 255));
+            data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,offset) * 255));
+            data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,offset) * 255));
+            data.push_back(255);
+        }
+    }
+
+    offset += 0.5;
+
+    glBindTexture(GL_TEXTURE_2D, textures[12]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, DIM, DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void GLContainer::generate_heightmap_XOR()
+{
+    //create the byte array
+    std::vector<unsigned char> data;
+
+    for(int x = 0; x < DIM; x++)
+    {
+        for(int y = 0; y < DIM; y++)
+        {
+            //cout << " "<< ((unsigned char)(x%256) ^ (unsigned char)(y%256));
+            data.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
+            data.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
+            data.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
+            data.push_back(255);
+        }
+    }
+
+    //send the data to the gpu
+    glBindTexture(GL_TEXTURE_2D, textures[12]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, DIM, DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
    // function to generate new block of 3d perlin noise
+void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, float zscale=0.014)
+{
+    PerlinNoise p;
+    std::vector<unsigned char> data;
+
+    for(int x = 0; x < DIM; x++)
+        for(int y = 0; y < DIM; y++)
+            for(int z = 0; z < DIM; z++)
+            {
+                data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,z*zscale) * 255));
+                data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,z*zscale) * 255));
+                data.push_back((unsigned char)(p.noise(x*xscale,y*yscale,z*zscale) * 255));
+                data.push_back(255);
+            }
+
+    glBindTexture(GL_TEXTURE_3D, textures[11]);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+    glGenerateMipmap(GL_TEXTURE_3D);
+}
+
+// VAT and Load will need a shader, that can copy and respect the mask
+
    // Brent Werness's Voxel Automata Terrain
    // load
    // save
