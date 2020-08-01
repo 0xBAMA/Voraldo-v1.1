@@ -13,14 +13,21 @@ void GLContainer::display_block()
     if(redraw_flag)
     {
         // do the tile based rendering using the raycast compute shader
-        // ...
+
+        glUseProgram(display_compute_shader);
+        glUniform1i(glGetUniformLocation(display_compute_shader, "current"), textures[0]); // display texture
+
+        // loop through tiles
+        // dispatch tiles, updating x, y offset each time
+
+        glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT ); // make sure everything finishes before blitting
 
         redraw_flag = false; // we won't need to draw anything again, till something changes
     }
 
 
     // ------------------------
-    // display shader takes texture and puts it on the screen
+    // display shader takes texture and blits it to the screen
 
     glUseProgram( display_shader );
     glBindVertexArray( display_vao );
@@ -388,11 +395,11 @@ void GLContainer::load_textures()
             }
 
 
-    for(unsigned int x = 0; x <= (screen_width*SSFACTOR); x++)
-        for(unsigned int y = 0; y <= (screen_height*SSFACTOR); y++)
+    for(unsigned int y = 0; y < (screen_height*SSFACTOR); y++)
+        for(unsigned int x = 0; x < (screen_width*SSFACTOR); x++)
         {
-            random.push_back(distribution(generator));
-            random.push_back(distribution(generator));
+            random.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
+            random.push_back(y);
             random.push_back(distribution(generator));
             random.push_back(distribution(generator));
         }

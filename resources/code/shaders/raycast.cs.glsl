@@ -75,20 +75,28 @@ bool hit(vec3 org, vec3 dir)
 }
 
 
-
-// supersampling factor, defined in includes.h
-uniform float ssfactor;
-
-// display texture dimensions
-uniform int x_dim;
-uniform int y_dim;
+// the display texture
+uniform layout(rgba16) image2D current; // we can get the dimensions with imageSize
 
 // because this is going to have to be tile-based, we need this local offset
 uniform int x_offset;
 uniform int y_offset;
 
+//gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
+// this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
 
 void main()
 {
+	vec2 Global_Loc = gl_GlobalInvocationID.xy + vec2(x_offset, y_offset);
+	vec2 dimensions = imageSize(current);
+	
+	if(Global_Loc.x < dimensions.x && Global_Loc.y < dimensions.y)
+	{
+		// we are good to check if you hit, and raycast if you do hit
+	}
+	else
+	{  
+		// this part of the tile falls outside of the image bounds, no operation should take place
+	}	
 
 }
