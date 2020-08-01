@@ -408,15 +408,19 @@ void Voraldo::draw_everything()
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   // from hsv picker
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     // clear the screen
 
+
+
+
     // draw the stuff on the GPU (block and orientation widget)
     GPU_Data.display();
+
+
+
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
-
-
 
     // draw the menu bar
     AppMainMenuBar();

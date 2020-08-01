@@ -47,7 +47,7 @@ void GLContainer::display_orientation_widget()
 
     // 4 cubes, 6 faces apiece, 2 triangles per face - total is 144 verticies
     glDrawArrays( GL_TRIANGLES, 0, 144);
-   
+
 }
 
 
@@ -64,7 +64,35 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     orientation_widget_shader = Shader("resources/code/shaders/widget.vs.glsl", "resources/code/shaders/widget.fs.glsl").Program;
 
     // ------------------------
-    // compiling compute shaders
+    // compiling compute shaders - note that ___.cs.glsl is just a placeholder
+
+    // Shapes
+    aabb_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    cuboid_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
+    cylinder_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+    ellipsoid_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
+    grid_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    heightmap_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
+    perlin_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
+    sphere_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
+    tube_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    triangle_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+
+    // GPU-side utilities
+    clear_all_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
+    unmask_all_compute           = CShader("resources/code/shaders/___.cs.glsl").Program;
+    invert_mask_compute          = CShader("resources/code/shaders/___.cs.glsl").Program;
+    mask_by_color_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
+    box_blur_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+    gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
+    shift_compute                = CShader("resources/code/shaders/___.cs.glsl").Program;
+
+    // Lighting
+    lighting_clear_compute       = CShader("resources/code/shaders/___.cs.glsl").Program;
+    directional_lighting_compute = CShader("resources/code/shaders/___.cs.glsl").Program;
+    ambient_occlusion_compute    = CShader("resources/code/shaders/___.cs.glsl").Program;
+    fakeGI_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
+    mash_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
 
 
 }
@@ -323,7 +351,7 @@ void GLContainer::cube_geometry(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3
         normals.push_back(normal);
         colors.push_back(color);
     }
-   
+
 }
 
 void GLContainer::load_textures()
@@ -379,7 +407,7 @@ void GLContainer::load_textures()
     glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-   
+
     // copy/paste buffer render texture - this is going to be a small rectangular texture, will only be shown inside the menus
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, textures[1]);
@@ -575,6 +603,7 @@ void GLContainer::mask_by_color(bool r, bool g, bool b, bool a, bool l, glm::vec
 {
 
 }
+
         // box blur
 void GLContainer::box_blur(int radius, bool touch_alpha, bool respect_mask)
 {
