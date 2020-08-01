@@ -78,6 +78,7 @@ bool hit(vec3 org, vec3 dir)
 // the display texture
 uniform layout(rgba16) image2D current; // we can get the dimensions with imageSize
 
+
 // because this is going to have to be tile-based, we need this local offset
 uniform int x_offset;
 uniform int y_offset;
@@ -85,20 +86,52 @@ uniform int y_offset;
 //gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
 // this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
 
+uniform vec4 clear_color;
+
+uniform float theta;
+uniform float phi;
+
+uniform float scale;
+
+
 void main()
 {
 	ivec2 Global_Loc = ivec2(gl_GlobalInvocationID.xy) + ivec2(x_offset, y_offset);
 	ivec2 dimensions = ivec2(imageSize(current));
 	
-	if(Global_Loc.x < dimensions.x && Global_Loc.y < dimensions.y)
-	{
-		// we are good to check if you hit, and raycast if you do hit
-	}
-	else
-	{  
-		// this part of the tile falls outside of the image bounds, no operation should take place
-	}	
+	float aspect_ratio = float(dimensions.y) / float(dimensions.x);
 	
-	imageStore(current, Global_Loc, vec4(1.0/float(pow(Global_Loc.x, 0.3)), 1.0/float(pow(Global_Loc.y, 0.3)), 0.0, 1.0));
+	float x_start = scale*((Global_Loc.x/float(dimensions.x)) - 0.5);
+	float y_start = scale*((Global_Loc.y/float(dimensions.y)) - 0.5)*(aspect_ratio);
+	
+	//start with a vector pointing down the z axis (greater than half the corner to corner distance, i.e. > ~1.75)
+	vec3 org = vec3(x_start, y_start,  2); //add the offsets in x and y
+	vec3 dir = vec3(      0,       0, -2); //simply a vector pointing in the opposite direction, no xy offsets
+
+	//rotate both vectors 'up' by phi, e.g. about the x axis
+	mat3 rotphi = rotationMatrix(vec3(1,0,0), phi);
+	org *= rotphi;
+	dir *= rotphi;
+
+	//rotate both about the y axis by theta
+	mat3 rottheta = rotationMatrix(vec3(0,1,0), theta);
+	org *= rottheta;
+	dir *= rottheta;
+	
+	if(Global_Loc.x < dimensions.x && Global_Loc.y < dimensions.y)
+	{  // we are good to check the ray against the AABB
+		if(hit(org,dir))
+		{
+			imageStore(current, Global_Loc, vec4(x_start, y_start, x_start*y_start, 1.0));
+		}
+		else
+		{
+			imageStore(current, Global_Loc, clear_color);
+		}
+	}  // else, this part of the tile falls outside of the image bounds, no operation should take place
+
+	
+	
+	
 
 }

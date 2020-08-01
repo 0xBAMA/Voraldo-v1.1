@@ -10,12 +10,23 @@ void GLContainer::display_block()
     // Optimization idea: it is not neccesary to raycast if there has been no changes since the last frame -
     //   these changes would include drawing, lighting, rotation, zooming...
 
-    // if(redraw_flag)
+    if(redraw_flag)
     {
         // do the tile based rendering using the raycast compute shader
-
         glUseProgram(display_compute_shader);
-        glUniform1i(glGetUniformLocation(display_compute_shader, "current"), 0); // display texture
+
+        // display texture
+        glUniform1i(glGetUniformLocation(display_compute_shader, "current"), 0);
+
+        // rotation parameters
+        glUniform1f(glGetUniformLocation(display_compute_shader, "theta"), theta);
+        glUniform1f(glGetUniformLocation(display_compute_shader, "phi"), phi);
+
+        // zoom parameter
+        glUniform1f(glGetUniformLocation(display_compute_shader, "scale"), scale);
+
+        // clear color
+        glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
 
         // loop through tiles
         for(int x = 0; x < SSFACTOR*screen_width; x += TILESIZE)

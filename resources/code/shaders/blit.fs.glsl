@@ -17,5 +17,5 @@ void main()
 	// else
 	// 	discard;
 	
-	fragment_output = texture(main_display_texture, ssfactor*gl_FragCoord.xy);
+	fragment_output = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
 }

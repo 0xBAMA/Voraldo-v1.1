@@ -78,7 +78,7 @@ using std::endl;
 constexpr double pi = 3.14159265358979323846;
 
 // supersampling factor for main display shader
-#define SSFACTOR 1.0
+#define SSFACTOR 2.8
 
 // for the tile based rendering - needs to be a multiple of 32
 #define TILESIZE 256
