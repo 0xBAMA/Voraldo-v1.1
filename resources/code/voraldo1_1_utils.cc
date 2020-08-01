@@ -42,7 +42,6 @@ void Voraldo::create_window()
 
     // window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
     window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE );
-    SDL_ShowWindow(window);
 
     // OpenGL 4.3 + GLSL version 430
     const char* glsl_version = "#version 430";
@@ -158,6 +157,8 @@ void Voraldo::gl_setup()
     GPU_Data.screen_height = total_screen_height;
 
     GPU_Data.init(); // wrapper for all the GPU-side setup
+
+    SDL_ShowWindow(window); // setup completed, show the window and start rendering
 }
 
 

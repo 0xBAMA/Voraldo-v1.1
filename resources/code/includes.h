@@ -78,7 +78,8 @@ using std::endl;
 constexpr double pi = 3.14159265358979323846;
 
 // supersampling factor for main display shader
-#define SSFACTOR 1.5
+#define SSFACTOR 1.0 // no scaling
+
 
 // this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
 #define DIM 256

@@ -488,36 +488,144 @@ void GLContainer::swap_blocks()
 // ------------------------
 // Shapes
 
-   // aabb
-   // sphere
-   // cylinder
-   // tube
-   // cuboid
-   // triangle
-   // grid
-   // ellipsoid
-   // heightmap
-   // perlin noise
+       // aabb
+void GLContainer::draw_aabb(glm::vec3 min, glm::vec3 max, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // cuboid
+void GLContainer::draw_cuboid(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, glm::vec3 e, glm::vec3 f, glm::vec3 g, glm::vec3 h, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // cylinder
+void GLContainer::draw_cylinder(glm::vec3 bvec, glm::vec3 tvec, float radius, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // ellipsoid
+void GLContainer::draw_ellipsoid(glm::vec3 center, glm::vec3 radii, glm::vec3 rotation, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // grid
+void GLContainer::draw_grid(glm::ivec3 spacing, glm::ivec3 widths, glm::ivec3 offsets, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // heightmap
+void GLContainer::draw_heightmap(float height_scale, bool height_color, glm::vec4 color, bool mask, bool draw)
+{
+
+}
+
+       // perlin noise
+void GLContainer::draw_perlin_noise(float low_thresh, float high_thresh, bool smooth, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // sphere
+void GLContainer::draw_sphere(glm::vec3 location, float radius, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // tube
+void GLContainer::draw_tube(glm::vec3 bvec, glm::vec3 tvec, float inner_radius, float outer_radius, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
+       // triangle
+void GLContainer::draw_triangle(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3, float thickness, glm::vec4 color, bool draw, bool mask)
+{
+
+}
+
 
 // ------------------------
 // GPU-side utilities
 
-   // clear all
-   // unmask all
-   // invert mask
-   // mask by color
-   // blur
-   // shifting
+        // clear all
+void GLContainer::clear_all(bool respect_mask)
+{
+
+}
+
+        // unmask all
+void GLContainer::unmask_all()
+{
+
+}
+
+        // invert mask
+void GLContainer::invert_mask()
+{
+
+}
+
+        // mask by color
+void GLContainer::mask_by_color(bool r, bool g, bool b, bool a, bool l, glm::vec4 color, float l_val, float r_var, float g_var, float b_var, float a_var, float l_var)
+{
+
+}
+        // box blur
+void GLContainer::box_blur(int radius, bool touch_alpha, bool respect_mask)
+{
+
+}
+
+        // gaussian blur
+void GLContainer::gaussian_blur(int radius, bool touch_alpha, bool respect_mask)
+{
+
+}
+
+        // shifting
+void GLContainer::shift(glm::ivec3 movement, bool loop, int mode)
+{
+
+}
 
 
 // ------------------------
 // Lighting
 
-   // lighting clear (to cached level)
-   // directional
-   // ambient occlusion
-   // fake GI
-   // mash (combine light into color buffer)
+        // lighting clear (to cached level, or to some set level, default zero)
+void GLContainer::lighting_clear(bool use_cache_level, float intensity)
+{
+
+}
+
+        // directional
+void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity)
+{
+
+}
+
+        // ambient occlusion
+void GLContainer::compute_ambient_occlusion(int radius)
+{
+
+}
+
+        // fake GI
+void GLContainer::compute_fake_GI(float factor, float sky_intensity, float thresh)
+{
+
+}
+
+        // mash (combine light into color buffer)
+void GLContainer::mash()
+{
+
+}
 
 
 // ------------------------
@@ -651,8 +759,23 @@ void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, f
     glGenerateMipmap(GL_TEXTURE_3D);
 }
 
-// VAT and Load will need a shader, that can copy and respect the mask
+// VAT and Load will need a shader, that can copy and respect the mask - save is more trivial
 
    // Brent Werness's Voxel Automata Terrain
+std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
+{
+    std::string temp;
+    return temp;
+}
+
    // load
+void GLContainer::load(std::string filename, bool respect_mask)
+{
+
+}
+
    // save
+void GLContainer::save(std::string filename)
+{
+
+}
