@@ -77,7 +77,7 @@ bool hit(vec3 org, vec3 dir)
 
 // the display texture
 uniform layout(rgba16) image2D current; // we can get the dimensions with imageSize
-
+uniform layout(rgba8) image3D block;
 
 // because this is going to have to be tile-based, we need this local offset
 uniform int x_offset;
@@ -122,7 +122,13 @@ void main()
 	{  // we are good to check the ray against the AABB
 		if(hit(org,dir))
 		{
-			imageStore(current, Global_Loc, vec4(x_start, y_start, x_start*y_start, 1.0));
+			// imageStore(current, Global_Loc, vec4(x_start, y_start, x_start*y_start, 1.0));
+
+    		//this colors based on a texture read at tmin
+    		ivec3 sample_location = ivec3((org+tmin*dir+vec3(1))*127.5);
+    		vec4 fragment_output = imageLoad(block,sample_location);
+		
+			imageStore(current, Global_Loc, fragment_output);
 		}
 		else
 		{
