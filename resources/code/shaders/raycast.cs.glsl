@@ -99,6 +99,6 @@ void main()
 		// this part of the tile falls outside of the image bounds, no operation should take place
 	}	
 	
-	imageStore(current, Global_Loc, vec4(1.0/float(pow(gl_GlobalInvocationID.x, 0.3)), 1.0/float(pow(gl_GlobalInvocationID.y, 0.3)), 0.0, 1.0));
+	imageStore(current, Global_Loc, vec4(1.0/float(pow(Global_Loc.x, 0.3)), 1.0/float(pow(Global_Loc.y, 0.3)), 0.0, 1.0));
 
 }
