@@ -87,8 +87,8 @@ uniform int y_offset;
 
 void main()
 {
-	vec2 Global_Loc = gl_GlobalInvocationID.xy + vec2(x_offset, y_offset);
-	vec2 dimensions = imageSize(current);
+	ivec2 Global_Loc = ivec2(gl_GlobalInvocationID.xy) + ivec2(x_offset, y_offset);
+	ivec2 dimensions = ivec2(imageSize(current));
 	
 	if(Global_Loc.x < dimensions.x && Global_Loc.y < dimensions.y)
 	{
@@ -98,5 +98,7 @@ void main()
 	{  
 		// this part of the tile falls outside of the image bounds, no operation should take place
 	}	
+	
+	imageStore(current, Global_Loc, vec4(1.0/float(pow(gl_GlobalInvocationID.x, 0.3)), 1.0/float(pow(gl_GlobalInvocationID.y, 0.3)), 0.0, 1.0));
 
 }

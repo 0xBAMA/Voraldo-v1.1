@@ -10,19 +10,31 @@ void GLContainer::display_block()
     // Optimization idea: it is not neccesary to raycast if there has been no changes since the last frame -
     //   these changes would include drawing, lighting, rotation, zooming...
 
-    if(redraw_flag)
+    // if(redraw_flag)
     {
         // do the tile based rendering using the raycast compute shader
 
         glUseProgram(display_compute_shader);
-        glUniform1i(glGetUniformLocation(display_compute_shader, "current"), textures[0]); // display texture
+        glUniform1i(glGetUniformLocation(display_compute_shader, "current"), 0); // display texture
 
         // loop through tiles
-        // dispatch tiles, updating x, y offset each time
+        for(int x = 0; x < SSFACTOR*screen_width; x += TILESIZE)
+        {
+            // update the x offset
+            glUniform1i(glGetUniformLocation(display_compute_shader, "x_offset"), x);
+            for(int y = 0; y < SSFACTOR*screen_height; y += TILESIZE)
+            {
+                // update the y offset
+                glUniform1i(glGetUniformLocation(display_compute_shader, "y_offset"), y);
+
+                // dispatch tiles
+                glDispatchCompute(TILESIZE/32, TILESIZE/32, 1);
+            }
+        }
 
         glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT ); // make sure everything finishes before blitting
 
-        redraw_flag = false; // we won't need to draw anything again, till something changes
+        // redraw_flag = false; // we won't need to draw anything again, till something changes
     }
 
 
@@ -401,7 +413,7 @@ void GLContainer::load_textures()
             random.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
             random.push_back(y);
             random.push_back(distribution(generator));
-            random.push_back(distribution(generator));
+            random.push_back(255);
         }
 
 
