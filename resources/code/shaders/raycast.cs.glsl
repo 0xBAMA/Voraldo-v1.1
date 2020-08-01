@@ -74,6 +74,20 @@ bool hit(vec3 org, vec3 dir)
   return true;
 }
 
+
+
+// supersampling factor, defined in includes.h
+uniform float ssfactor;
+
+// display texture dimensions
+uniform int x_dim;
+uniform int y_dim;
+
+// because this is going to have to be tile-based, we need this local offset
+uniform int x_offset;
+uniform int y_offset;
+
+
 void main()
 {
 

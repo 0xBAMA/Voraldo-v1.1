@@ -128,6 +128,8 @@ class GLContainer
 
     private:
 
+        bool redraw_flag = true;
+
         // display helper functions
         void display_block();
         void display_orientation_widget();

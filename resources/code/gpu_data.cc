@@ -10,6 +10,14 @@ void GLContainer::display_block()
     // Optimization idea: it is not neccesary to raycast if there has been no changes since the last frame -
     //   these changes would include drawing, lighting, rotation, zooming...
 
+    if(redraw_flag)
+    {
+        // do the tile based rendering using the raycast compute shader
+        // ...
+
+        redraw_flag = false; // we won't need to draw anything again, till something changes
+    }
+
 
     // ------------------------
     // display shader takes texture and puts it on the screen
@@ -64,7 +72,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     orientation_widget_shader = Shader("resources/code/shaders/widget.vs.glsl", "resources/code/shaders/widget.fs.glsl").Program;
 
     // ------------------------
-    // compiling compute shaders - note that ___.cs.glsl is just a placeholder
+    // compiling compute shaders - note that ___.cs.glsl is just a placeholder with the bare minimum to compile
 
     // Shapes
     aabb_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -514,7 +522,7 @@ void GLContainer::swap_blocks()
 }
 
 // ------------------------
-// Shapes
+// Shapes -- all will require redraw_flag to be set
 
        // aabb
 void GLContainer::draw_aabb(glm::vec3 min, glm::vec3 max, glm::vec4 color, bool draw, bool mask)
@@ -578,7 +586,7 @@ void GLContainer::draw_triangle(glm::vec3 point1, glm::vec3 point2, glm::vec3 po
 
 
 // ------------------------
-// GPU-side utilities
+// GPU-side utilities -- all except masking functions will require redraw_flag be set true
 
         // clear all
 void GLContainer::clear_all(bool respect_mask)
@@ -624,7 +632,7 @@ void GLContainer::shift(glm::ivec3 movement, bool loop, int mode)
 
 
 // ------------------------
-// Lighting
+// Lighting -- most of these will require redraw_flag be set true
 
         // lighting clear (to cached level, or to some set level, default zero)
 void GLContainer::lighting_clear(bool use_cache_level, float intensity)
@@ -790,14 +798,14 @@ void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, f
 
 // VAT and Load will need a shader, that can copy and respect the mask - save is more trivial
 
-   // Brent Werness's Voxel Automata Terrain
+   // Brent Werness's Voxel Automata Terrain - set redraw_flag to true
 std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
 {
     std::string temp;
     return temp;
 }
 
-   // load
+   // load - set redraw_flag to true
 void GLContainer::load(std::string filename, bool respect_mask)
 {
 
