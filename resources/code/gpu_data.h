@@ -129,7 +129,7 @@ class GLContainer
     private:
 
         bool redraw_flag = true;
-        int tex_offset = 0;
+        int tex_offset = 0; //this is better than rebinding textures, it is either 0 or 1
 
         // display helper functions
         void display_block();

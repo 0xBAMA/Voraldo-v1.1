@@ -18,6 +18,7 @@ void GLContainer::display_block()
         // display texture
         glUniform1i(glGetUniformLocation(display_compute_shader, "current"), 0);
         glUniform1i(glGetUniformLocation(display_compute_shader, "block"),   2 + tex_offset);
+        glUniform1i(glGetUniformLocation(display_compute_shader, "lighting"), 6);
 
         // rotation parameters
         glUniform1f(glGetUniformLocation(display_compute_shader, "theta"), theta);

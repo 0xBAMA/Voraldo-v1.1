@@ -79,7 +79,7 @@ void Voraldo::create_window()
     ImGui_ImplSDL2_InitForOpenGL(window, GLcontext);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 75.0f/255.0f, 0.5f); // initial value for clear color
+    clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 175.0f/255.0f, 1.0f); // initial value for clear color
 
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear( GL_COLOR_BUFFER_BIT );
@@ -155,6 +155,8 @@ void Voraldo::gl_setup()
 
     GPU_Data.screen_width = total_screen_width;
     GPU_Data.screen_height = total_screen_height;
+
+    GPU_Data.clear_color = glm::vec4(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
     GPU_Data.init(); // wrapper for all the GPU-side setup
 

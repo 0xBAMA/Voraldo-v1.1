@@ -25,6 +25,27 @@ double tmin, tmax; //global scope, set in hit() to tell min and max parameters
 #define MIN_DISTANCE 0.0
 #define MAX_DISTANCE 10.0
 
+
+// the display texture
+uniform layout(rgba16) image2D current; // we can get the dimensions with imageSize
+uniform layout(rgba8) image3D block;
+uniform layout(r8) image3D lighting;
+
+// because this is going to have to be tile-based, we need this local offset
+uniform int x_offset;
+uniform int y_offset;
+
+//gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
+// this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
+
+uniform vec4 clear_color;
+
+uniform float theta;
+uniform float phi;
+
+uniform float scale;
+
+
 bool hit(vec3 org, vec3 dir)
 {
   // hit() code adapted from:
@@ -74,25 +95,47 @@ bool hit(vec3 org, vec3 dir)
   return true;
 }
 
+vec4 get_color_for_pixel(vec3 org, vec3 dir)
+{
+  float current_t = float(tmax);
+  // vec4 t_color = vec4(0);
+  vec4 t_color = clear_color;
 
-// the display texture
-uniform layout(rgba16) image2D current; // we can get the dimensions with imageSize
-uniform layout(rgba8) image3D block;
+  float step = float((tmax-tmin))/NUM_STEPS;
+  if(step < 0.001f)
+    step = 0.001f;
+    
+  vec3 block_size = vec3(imageSize(block));
 
-// because this is going to have to be tile-based, we need this local offset
-uniform int x_offset;
-uniform int y_offset;
+  ivec3 samp = ivec3((block_size/2.0f)*(org+current_t*dir+vec3(1)));
 
-//gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
-// this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
+  vec4 new_read = imageLoad(block,samp);
+  vec4 new_light_read = imageLoad(lighting,samp);
 
-uniform vec4 clear_color;
+  float alpha_squared;
 
-uniform float theta;
-uniform float phi;
+  for(int i = 0; i < NUM_STEPS; i++)
+  {
+    if(current_t>=tmin)
+    {
+      //apply the lighting scaling
+      new_read.rgb *= (4*new_light_read.r);
+      alpha_squared = new_read.a * new_read.a;	// < might want to make this variable
+      // (along the lines of gamma correction, with pow() and a uniform float to control the power)
 
-uniform float scale;
+      // it's a over b, where a is the new sample and b is the current color, t_color
+      t_color.rgb = new_read.rgb * alpha_squared + t_color.rgb * t_color.a * ( 1 - alpha_squared );
+      t_color.a = alpha_squared + t_color.a * ( 1 - alpha_squared );
 
+      current_t -= step;
+      samp = ivec3((block_size/2.0f)*(org+current_t*dir+vec3(1)));
+
+      new_read = imageLoad(block,samp);
+      new_light_read = imageLoad(lighting,samp);
+    }
+  }
+  return t_color;
+}
 
 void main()
 {
@@ -122,22 +165,11 @@ void main()
 	{  // we are good to check the ray against the AABB
 		if(hit(org,dir))
 		{
-			// imageStore(current, Global_Loc, vec4(x_start, y_start, x_start*y_start, 1.0));
-
-    		//this colors based on a texture read at tmin
-    		ivec3 sample_location = ivec3((org+tmin*dir+vec3(1))*127.5);
-    		vec4 fragment_output = imageLoad(block,sample_location);
-		
-			imageStore(current, Global_Loc, fragment_output);
+			imageStore(current, Global_Loc, get_color_for_pixel(org, dir));
 		}
 		else
 		{
-			imageStore(current, Global_Loc, clear_color);
+			imageStore(current, Global_Loc, vec4(0));
 		}
 	}  // else, this part of the tile falls outside of the image bounds, no operation should take place
-
-	
-	
-	
-
 }
