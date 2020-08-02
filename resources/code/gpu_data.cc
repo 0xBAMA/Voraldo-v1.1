@@ -126,7 +126,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     box_blur_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
     gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
     shift_compute                = CShader("resources/code/shaders/___.cs.glsl").Program;
-    copy_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    copy_loadbuff_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
 
     // Lighting
     lighting_clear_compute       = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -134,7 +134,6 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     ambient_occlusion_compute    = CShader("resources/code/shaders/___.cs.glsl").Program;
     fakeGI_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
     mash_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
-
 
 }
 
@@ -462,8 +461,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_3D, textures[2]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &ucxor[0]);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 

@@ -318,41 +318,44 @@ void Voraldo::ShowExampleMenuFile()
 
 
 // this is my top bar menu
-void Voraldo::AppMainMenuBar()
+void Voraldo::AppMainMenuBar(bool *open)
 {
-    if (ImGui::BeginMainMenuBar())
+    if(*open)
     {
-        if (ImGui::BeginMenu("File"))
+        if (ImGui::BeginMainMenuBar())
         {
-            ShowExampleMenuFile();
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit"))
-        {
-            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-            ImGui::Separator();
-            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Display"))
-        {
-            if (ImGui::MenuItem("Show FPS Overlay", NULL, show_fpsoverlay)) {show_fpsoverlay = !show_fpsoverlay;}
-            if (ImGui::MenuItem("Show Orientation", NULL, GPU_Data.show_widget)) {GPU_Data.show_widget = !GPU_Data.show_widget;}
-            if (ImGui::MenuItem("Show Controls", NULL, show_controls)) {show_controls = !show_controls;}
-            if (ImGui::MenuItem("Show Demo Window", NULL, show_demo_window)) {show_demo_window = !show_demo_window;}
-            if (ImGui::BeginMenu("Show on Display"))
+            if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Display 0")) {SDL_SetWindowPosition(window, 0, 0);}
-                if (ImGui::MenuItem("Display 1")) {SDL_SetWindowPosition(window, total_screen_width, 0);}
-                if (ImGui::MenuItem("Display 2")) {SDL_SetWindowPosition(window, 2*total_screen_width, 0);}
+                ShowExampleMenuFile();
                 ImGui::EndMenu();
             }
-            ImGui::EndMenu();
+            if (ImGui::BeginMenu("Edit"))
+            {
+                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+                if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+                ImGui::Separator();
+                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Display"))
+            {
+                if (ImGui::MenuItem("Show FPS Overlay", NULL, show_fpsoverlay)) {show_fpsoverlay = !show_fpsoverlay;}
+                if (ImGui::MenuItem("Show Orientation", NULL, GPU_Data.show_widget)) {GPU_Data.show_widget = !GPU_Data.show_widget;}
+                if (ImGui::MenuItem("Show Controls", NULL, show_controls)) {show_controls = !show_controls;}
+                if (ImGui::MenuItem("Show Demo Window", NULL, show_demo_window)) {show_demo_window = !show_demo_window;}
+                if (ImGui::BeginMenu("Show on Display"))
+                {
+                    if (ImGui::MenuItem("Display 0")) {SDL_SetWindowPosition(window, 0, 0);}
+                    if (ImGui::MenuItem("Display 1")) {SDL_SetWindowPosition(window, total_screen_width, 0);}
+                    if (ImGui::MenuItem("Display 2")) {SDL_SetWindowPosition(window, 2*total_screen_width, 0);}
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
         }
-        ImGui::EndMainMenuBar();
     }
 }
 
@@ -361,9 +364,10 @@ void Voraldo::ControlWindow(bool *open)
 {
     if(*open)
     {
-    ImGuiWindowFlags flags = 0;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+    // ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration;
 
-    ImGui::SetNextWindowPos(ImVec2(0,19));
+    ImGui::SetNextWindowPos(ImVec2(0,show_menu?19:0));
     ImGui::SetNextWindowSize(ImVec2(320,385), ImGuiCond_FirstUseEver);
     ImGui::Begin("Controls", open, flags);
 
@@ -371,26 +375,139 @@ void Voraldo::ControlWindow(bool *open)
   // tabbed layout
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
 
-    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+    if (ImGui::BeginTabBar("TopTabBar", tab_bar_flags))
     {
-        if (ImGui::BeginTabItem("Simulation"))
+        if (ImGui::BeginTabItem(" Shapes "))
         {
-            ImGui::Separator();
-            ImGui::Text(" ");
+            ImGui::BeginTabBar("s", tab_bar_flags);
+
+            if(ImGui::BeginTabItem(" AABB "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Cuboid "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Cylinder "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Ellipsoid "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Grid "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Heightmap "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Perlin "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Sphere "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Tube "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Triangle "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" VAT "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Rendering"))
+        if (ImGui::BeginTabItem(" Utilities "))
         {
-            ImGui::Separator();
-            ImGui::Text(" ");
+            ImGui::BeginTabBar("u", tab_bar_flags);
+
+            if(ImGui::BeginTabItem(" Clear "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Masking "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Blur "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Shift "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Copy/Paste "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Load/Save "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Instructions"))
+        if (ImGui::BeginTabItem(" Lighting "))
         {
-            ImGui::Separator();
-            ImGui::Text(" ");
+            ImGui::BeginTabBar("l", tab_bar_flags);
+
+            if(ImGui::BeginTabItem(" Clear Lighting "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Fake GI "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Ambient Occlusion "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Directional "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            if(ImGui::BeginTabItem(" Mash "))
+            {
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
             ImGui::EndTabItem();
         }
 
@@ -433,7 +550,7 @@ void Voraldo::draw_everything()
     ImGui::NewFrame();
 
     // draw the menu bar
-    AppMainMenuBar();
+    AppMainMenuBar(&show_menu);
 
     // draw the FPS overlay
     FPSOverlay(&show_fpsoverlay);
@@ -481,6 +598,8 @@ void Voraldo::draw_everything()
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_EQUALS) //SDLK_PLUS requires that you hit the shift
             GPU_Data.scale -= 0.1f;     //make scale larger  (offsets are smaller)
 
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_m)
+            show_menu = !show_menu;
 
         // specific directions
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)

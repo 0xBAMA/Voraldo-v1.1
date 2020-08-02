@@ -26,9 +26,10 @@ class Voraldo
 		bool show_fpsoverlay  = true;
 		bool show_controls    = true;
 		bool show_demo_window = false;
+		bool show_menu        = true;
 
 		void ControlWindow(bool *open);
-		void AppMainMenuBar();
+		void AppMainMenuBar(bool *open);
 		void ShowExampleMenuFile();
 		void FPSOverlay(bool* p_open);
 		void HelpMarker(const char* desc);
