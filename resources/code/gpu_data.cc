@@ -126,6 +126,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     box_blur_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
     gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
     shift_compute                = CShader("resources/code/shaders/___.cs.glsl").Program;
+    copy_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
 
     // Lighting
     lighting_clear_compute       = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -453,12 +454,16 @@ void GLContainer::load_textures()
     glBindTexture(GL_TEXTURE_2D, textures[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, 512, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glBindImageTexture(1, textures[1], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA16);
+    // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
     // main block front color buffer - initialize with xor
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_3D, textures[2]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &ucxor[0]);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
@@ -466,6 +471,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 3);
     glBindTexture(GL_TEXTURE_3D, textures[3]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
@@ -473,6 +480,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 4);
     glBindTexture(GL_TEXTURE_3D, textures[4]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(4, textures[4], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
@@ -480,6 +489,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 5);
     glBindTexture(GL_TEXTURE_3D, textures[5]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
@@ -487,6 +498,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 6);
     glBindTexture(GL_TEXTURE_3D, textures[6]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, &light[0]);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(6, textures[6], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
@@ -494,6 +507,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 7);
     glBindTexture(GL_TEXTURE_3D, textures[7]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, DIM, DIM, DIM, 0, GL_RED, GL_UNSIGNED_BYTE, &light[0]);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(7, textures[7], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
 
@@ -501,6 +516,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 8);
     glBindTexture(GL_TEXTURE_3D, textures[8]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(8, textures[8], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
@@ -508,6 +525,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 9);
     glBindTexture(GL_TEXTURE_3D, textures[9]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(9, textures[9], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
@@ -515,6 +534,8 @@ void GLContainer::load_textures()
     glActiveTexture(GL_TEXTURE0 + 10);
     glBindTexture(GL_TEXTURE_3D, textures[10]);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(10, textures[10], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
 
@@ -549,18 +570,9 @@ void GLContainer::load_textures()
 // manipulating the block
 void GLContainer::swap_blocks()
 {
-    // std::swap(textures[2], textures[3]); // swap color buffers
-    // std::swap(textures[4], textures[5]); // swap mask buffers
-
-    // // update bindings
-    // glBindImageTexture(2, textures[2], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
-    // glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
-
-    // glBindImageTexture(4, textures[4], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
-    // glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
-
     // keep the data from moving
-    tex_offset = tex_offset ? 0 : 1;
+    tex_offset = tex_offset ? 0 : 1; // because the blocks are in neighboring units, adding this value
+                                     // to the number of the lower unit works to switch between them
 }
 
 // ------------------------

@@ -63,6 +63,7 @@ void Voraldo::create_window()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_TEXTURE_3D);
 
     glPointSize(3.0);
     glEnable(GL_BLEND);
@@ -79,7 +80,7 @@ void Voraldo::create_window()
     ImGui_ImplSDL2_InitForOpenGL(window, GLcontext);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    clear_color = ImVec4(75.0f/255.0f, 75.0f/255.0f, 175.0f/255.0f, 1.0f); // initial value for clear color
+    clear_color = ImVec4(42.0f/255.0f, 36.0f/255.0f, 5.0f/255.0f, 1.0f); // initial value for clear color
 
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear( GL_COLOR_BUFFER_BIT );

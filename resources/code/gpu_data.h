@@ -198,6 +198,7 @@ class GLContainer
         GLuint box_blur_compute;
         GLuint gaussian_blur_compute;
         GLuint shift_compute;
+        GLuint copy_compute;
 
         // Lighting
         GLuint lighting_clear_compute;
