@@ -1,5 +1,7 @@
 # Voraldo v1.1
 
+This is the continuation of v1.0, which can be found here: https://github.com/0xBAMA/v1.0
+
 This incorporates a lot of changes over [v1.0](https://jbaker.graphics/writings/voraldo.html) - a lot of small quality of life type fixes to make use of the editor more friendly, but I am also making it a point to move forwards on some different things I've been thinking about. 
 
 Some of the bigger things:
