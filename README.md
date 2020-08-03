@@ -4,7 +4,9 @@ This is the continuation of v1.0, which can be found here: https://github.com/0x
 
 This incorporates a lot of changes over [v1.0](https://jbaker.graphics/writings/voraldo.html) - a lot of small quality of life type fixes to make use of the editor more friendly, but I am also making it a point to move forwards on some different things I've been thinking about. 
 
-Some of the bigger things:
+For more context, I have uploaded a number of videos which detail its use, [to a playlist here](https://www.youtube.com/playlist?list=PLnmfoWdOnCwX-MSTSSiSGJFqlgSY0E1QE).
+
+Some of the bigger changes I have planned:
  
  - completely redoing the menu - add top menu bar, togglable overlay with fps + fps graph, and a small widget that helps the user stay oriented in 3d space
  - switching to uimage3D buffers, for more consistent behavior
