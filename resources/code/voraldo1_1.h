@@ -32,7 +32,7 @@ class Voraldo
 		void AppMainMenuBar(bool *open);
 		void ShowExampleMenuFile();
 		void FPSOverlay(bool* p_open);
-		void HelpMarker(const char* desc);
+		void HelpMarker(const char* indicator, const char* desc);
 
 		void create_window();
 		void gl_setup();

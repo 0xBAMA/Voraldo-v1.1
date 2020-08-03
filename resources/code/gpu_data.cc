@@ -677,6 +677,12 @@ void GLContainer::gaussian_blur(int radius, bool touch_alpha, bool respect_mask)
 
 }
 
+        // limiter
+void GLContainer::limiter()
+{
+
+}
+
         // shifting
 void GLContainer::shift(glm::ivec3 movement, bool loop, int mode)
 {

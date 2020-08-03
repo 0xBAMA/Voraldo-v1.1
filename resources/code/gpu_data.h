@@ -75,6 +75,9 @@ class GLContainer
         // gaussian blur
         void gaussian_blur(int radius, bool touch_alpha, bool respect_mask);
 
+        // limiter - details tbd
+        void limiter();
+
         // shifting
         void shift(glm::ivec3 movement, bool loop, int mode);
 
@@ -122,7 +125,7 @@ class GLContainer
         glm::vec4 clear_color;
 
         // display parameters - public so they can be manipulated
-        float scale = 5.0f, theta = 0.0f, phi = 0.0f;
+        float scale = 7.0f, theta = 0.0f, phi = 0.0f;
 
         unsigned int screen_width, screen_height;
 
