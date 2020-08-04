@@ -2,7 +2,9 @@
 
 This is the continuation of v1.0, which can be found here: https://github.com/0xBAMA/v1.0
 
-This incorporates a lot of changes over [v1.0](https://jbaker.graphics/writings/voraldo.html) - a lot of small quality of life type fixes to make use of the editor more friendly, but I am also making it a point to move forwards on some different things I've been thinking about. 
+It is a work in progress, and so far I have almost gotten back to the level of functionality provided by v1.0. I have decided to rewrite most of the project, and make sure that the code is easier to understand and easier to extend so that I can experiment with new ideas in the editor.
+
+v1.1 incorporates a lot of changes over [v1.0](https://jbaker.graphics/writings/voraldo.html) - a lot of small quality of life type fixes to make use of the editor more friendly, but I am also making it a point to move forwards on some different things I've been thinking about. 
 
 For more context, I have uploaded a number of videos which detail its use, [to a playlist here](https://www.youtube.com/playlist?list=PLnmfoWdOnCwX-MSTSSiSGJFqlgSY0E1QE).
 
