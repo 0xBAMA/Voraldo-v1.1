@@ -423,6 +423,7 @@ void Voraldo::ControlWindow(bool *open)
         ImGui::SetNextWindowSize(ImVec2(320,385), ImGuiCond_FirstUseEver);
         ImGui::Begin("Controls", open, flags);
 
+        ImVec2 windowsize = ImGui::GetWindowSize();
 
         // tabbed layout
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
@@ -1528,18 +1529,20 @@ void Voraldo::ControlWindow(bool *open)
 
                     ImGui::EndTabItem();
                 }
-
                 ImGui::EndTabBar();
+
                 ImGui::EndTabItem();
+
             }
 
-            ImGui::SameLine();
-            HelpMarker("(?)","Pick the type of operation");
-
-            ImGui::EndTabBar();
-
+        }
+        if (ImGui::BeginTabItem("Instructions"))
+        {
+            cout << "size is " << windowsize.x << " " << windowsize.y << endl;
+            ImGui::EndTabItem();
         }
 
+        ImGui::EndTabBar();
         ImGui::End();
     }
 }

@@ -10,8 +10,21 @@ void GLContainer::display_block()
     // Optimization idea: it is not neccesary to raycast if there has been no changes since the last frame -
     //   these changes would include drawing, lighting, rotation, zooming...
 
+    static float temp_scale;
+    static float temp_theta;
+    static float temp_phi;
+
+    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi))
+        redraw_flag = true;
+
+    temp_scale = scale;
+    temp_theta = theta;
+    temp_phi = phi;
+
     if(redraw_flag)
     {
+        // cout << "redrawing" << endl;
+
         // do the tile based rendering using the raycast compute shader
         glUseProgram(display_compute_shader);
 
@@ -47,7 +60,7 @@ void GLContainer::display_block()
 
         glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT ); // make sure everything finishes before blitting
 
-        // redraw_flag = false; // we won't need to draw anything again, till something changes
+        redraw_flag = false; // we won't need to draw anything again, till something changes
     }
 
 
