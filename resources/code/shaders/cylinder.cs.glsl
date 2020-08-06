@@ -44,7 +44,7 @@ bool planetest(vec3 plane_point, vec3 plane_normal, vec3 test_point)
 
 	result = a * (x - x1) + b * (y - y1) + c * (z - z1);
 
-	return (result < 0) ? true : false;
+	return (result <= 0) ? true : false;
 
 }
 

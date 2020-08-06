@@ -135,8 +135,8 @@ void GLContainer::compile_shaders() // going to make this more compact this time
 
     // Shapes
     aabb_compute                 = CShader("resources/code/shaders/aabb.cs.glsl").Program;
-    cuboid_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
-    cylinder_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+    cuboid_compute               = CShader("resources/code/shaders/cuboid.cs.glsl").Program;
+    cylinder_compute             = CShader("resources/code/shaders/cylinder.cs.glsl").Program;
     ellipsoid_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
     grid_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
     heightmap_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -607,7 +607,7 @@ void GLContainer::swap_blocks()
        // aabb
 void GLContainer::draw_aabb(glm::vec3 min, glm::vec3 max, glm::vec4 color, bool draw, bool mask)
 {
-    // need to redraw after this is done
+    // need to redraw after any drawing operation is done
     redraw_flag = true;
 
     swap_blocks();
@@ -634,13 +634,58 @@ void GLContainer::draw_aabb(glm::vec3 min, glm::vec3 max, glm::vec4 color, bool 
        // cuboid
 void GLContainer::draw_cuboid(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, glm::vec3 e, glm::vec3 f, glm::vec3 g, glm::vec3 h, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(cuboid_compute);
+
+    glUniform1i(glGetUniformLocation(cuboid_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(cuboid_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(cuboid_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "a"), 1, glm::value_ptr(a));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "b"), 1, glm::value_ptr(b));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "c"), 1, glm::value_ptr(c));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "d"), 1, glm::value_ptr(d));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "e"), 1, glm::value_ptr(e));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "f"), 1, glm::value_ptr(f));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "g"), 1, glm::value_ptr(g));
+    glUniform3fv(glGetUniformLocation(cuboid_compute, "h"), 1, glm::value_ptr(h));
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // cylinder
 void GLContainer::draw_cylinder(glm::vec3 bvec, glm::vec3 tvec, float radius, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(cylinder_compute);
+
+    glUniform1i(glGetUniformLocation(cylinder_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(cylinder_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(cylinder_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform1fv(glGetUniformLocation(cylinder_compute, "radius"), 1, &radius);
+    glUniform3fv(glGetUniformLocation(cylinder_compute, "bvec"), 1, glm::value_ptr(bvec));
+    glUniform3fv(glGetUniformLocation(cylinder_compute, "tvec"), 1, glm::value_ptr(tvec));
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // ellipsoid
