@@ -13,6 +13,8 @@ uniform float uphi;
 uniform float light_dim;
 uniform float light_intensity;
 
+uniform float decay_power;
+
 //thanks to Neil Mendoza via http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
 mat3 rotationMatrix(vec3 axis, float angle)
 {
@@ -105,7 +107,7 @@ void traceray(vec3 org, vec3 dir)
 
         //intensity -= new_color_read.a;
         //intensity *= 1-pow(new_color_read.a, 2);
-        intensity *= 1-new_color_read.a;
+        intensity *= 1-pow(new_color_read.a, decay_power);
 
         current_t += step;
         sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1))); 

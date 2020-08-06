@@ -88,7 +88,7 @@ class GLContainer
         void lighting_clear(bool use_cache_level, float intensity = 0.0);
 
         // directional
-        void compute_directional_lighting(float theta, float phi, float initial_ray_intensity);
+        void compute_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power);
 
         // ambient occlusion
         void compute_ambient_occlusion(int radius);

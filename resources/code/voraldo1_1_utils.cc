@@ -1421,6 +1421,7 @@ void Voraldo::ControlWindow(bool *open)
                     static float directional_theta;
                     static float directional_phi;
                     static float directional_intensity;
+                    static float decay_power;
 
                     static int AO_radius;
 
@@ -1454,9 +1455,10 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::SliderFloat("phi", &directional_phi, -3.14f, 3.14f, "%.3f");
                     ImGui::Text(" ");
                     ImGui::SliderFloat("value", &directional_intensity, 0.0f, 1.0f, "%.3f");
+                    ImGui::SliderFloat("decay", &decay_power, 0.0f, 3.0f, "%.3f");
 
                     if (ImGui::Button("Apply Directional", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
-                        GPU_Data.compute_directional_lighting(directional_theta, directional_phi, directional_intensity);
+                        GPU_Data.compute_directional_lighting(directional_theta, directional_phi, directional_intensity, decay_power);
 
                     //if (ImGui::Button("Per Frame", ImVec2(120, 22)))
                     //current_menu_state = PER_FRAME_LIGHTING_CONFIG;

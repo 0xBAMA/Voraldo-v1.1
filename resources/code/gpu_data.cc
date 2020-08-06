@@ -157,10 +157,10 @@ void GLContainer::compile_shaders() // going to make this more compact this time
 
     // Lighting
     lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;
-    directional_lighting_compute = CShader("resources/code/shaders/___.cs.glsl").Program;
-    ambient_occlusion_compute    = CShader("resources/code/shaders/___.cs.glsl").Program;
-    fakeGI_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
-    mash_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    directional_lighting_compute = CShader("resources/code/shaders/directional.cs.glsl").Program;
+    ambient_occlusion_compute    = CShader("resources/code/shaders/ambient_occlusion.cs.glsl").Program;
+    fakeGI_compute               = CShader("resources/code/shaders/fakeGI.cs.glsl").Program;
+    mash_compute                 = CShader("resources/code/shaders/mash.cs.glsl").Program;
 
 }
 
@@ -1045,31 +1045,86 @@ void GLContainer::lighting_clear(bool use_cache_level, float intensity)
 }
 
         // directional
-void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity)
+void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
 {
     redraw_flag = true;
+    glUseProgram(directional_lighting_compute);
 
+    glUniform1f(glGetUniformLocation(directional_lighting_compute, "utheta"), theta);
+    glUniform1f(glGetUniformLocation(directional_lighting_compute, "uphi"), phi);
+    glUniform1f(glGetUniformLocation(directional_lighting_compute, "light_dim"), LIGHT_DIM);
+    glUniform1f(glGetUniformLocation(directional_lighting_compute, "light_intensity"), initial_ray_intensity);
+    glUniform1f(glGetUniformLocation(directional_lighting_compute, "decay_power"), decay_power);
+
+    glUniform1i(glGetUniformLocation(directional_lighting_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(directional_lighting_compute, "lighting"), 6);
+
+    glDispatchCompute( LIGHT_DIM/8, LIGHT_DIM/8, 1 ); //workgroup is 8x8x1, so divide x and y by 8
+
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // ambient occlusion
 void GLContainer::compute_ambient_occlusion(int radius)
 {
     redraw_flag = true;
+    glUseProgram(ambient_occlusion_compute);
 
+    glUniform1i(glGetUniformLocation(ambient_occlusion_compute, "radius"), radius);
+
+    glUniform1i(glGetUniformLocation(ambient_occlusion_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(ambient_occlusion_compute, "lighting"), 6);
+
+    glDispatchCompute(DIM/8, DIM/8, DIM/8);
+
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // fake GI
 void GLContainer::compute_fake_GI(float factor, float sky_intensity, float thresh)
 {
     redraw_flag = true;
+    glUseProgram(fakeGI_compute);
 
+    glUniform1i(glGetUniformLocation(fakeGI_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(fakeGI_compute, "lighting"), 6);
+
+    glUniform1f(glGetUniformLocation(fakeGI_compute, "scale_factor"), factor);
+    glUniform1f(glGetUniformLocation(fakeGI_compute, "alpha_thresh"), thresh);
+    glUniform1f(glGetUniformLocation(fakeGI_compute, "sky_intensity"), sky_intensity);
+
+    // This has a sequential dependence - from the same guy who did the Voxel Automata Terrain, Brent Werness:
+    //   "Totally faked the GI!  It just casts out 9 rays in upwards facing the lattice directions.
+    //    If it escapes it gets light from the sky, otherwise it gets some fraction of the light
+    //    from whatever cell it hits.  Run from top to bottom and you are set!"
+
+    // For that reason, I'm doing 2d workgroups, starting from the top, going to the bottom.
+
+    for (int y = DIM-1; y >= 0; y--) //iterating through y, from top to bottom
+    {
+        // update y index
+        glUniform1i(glGetUniformLocation(fakeGI_compute, "y_index"), y);
+
+        // send the job, for one xz plane
+        glDispatchCompute(DIM/8, 1, DIM/8);
+
+        // wait for all those shader invocations to finish
+        glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+    }
 }
 
         // mash (combine light into color buffer)
 void GLContainer::mash()
 {
     redraw_flag = true;
+    glUseProgram(mash_compute);
 
+    glUniform1i(glGetUniformLocation(mash_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(mash_compute, "lighting"), 6);
+
+    glDispatchCompute(DIM/8, DIM/8, DIM/8);
+
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
 
