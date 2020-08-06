@@ -1539,7 +1539,7 @@ void Voraldo::ControlWindow(bool *open)
         if (ImGui::BeginTabItem(" Render Settings "))
         {
             // adjust postition of orientation widget, move it in x, y and z
-            static glm::vec3 offset = glm::vec3(0.9, -0.74, 0.0);
+            static glm::vec3 offset = glm::vec3(0.9, -0.741, 0.0);
 
             ImGui::Text("Move the orientation widget.");
 
@@ -1559,7 +1559,7 @@ void Voraldo::ControlWindow(bool *open)
             // adjust power on alpha correction - make sure to set GPU_Data.redraw_flag if it changes
             ImGui::Text("This is the correction factor for the alpha channel.");
 
-            ImGui::SliderFloat("alpha correction power", &GPU_Data.alpha_correction_power, 0.5, 2.5);
+            ImGui::SliderFloat("alpha correction power", &GPU_Data.alpha_correction_power, 0.5, 4.0);
 
             ImGui::Text(" ");
             ImGui::Text(" ");

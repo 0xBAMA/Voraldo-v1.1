@@ -38,12 +38,14 @@ uniform int y_offset;
 //gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
 // this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
 
-uniform vec4 clear_color;
+// uniform vec4 clear_color;
 
 uniform float theta;
 uniform float phi;
 
 uniform float scale;
+
+uniform float upow;
 
 
 bool hit(vec3 org, vec3 dir)
@@ -120,8 +122,8 @@ vec4 get_color_for_pixel(vec3 org, vec3 dir)
     {
       //apply the lighting scaling
       new_read.rgb *= (4*new_light_read.r);
-      alpha_squared = new_read.a * new_read.a;	// < might want to make this variable
-      // (along the lines of gamma correction, with pow() and a uniform float to control the power)
+      //alpha_squared = new_read.a * new_read.a;	// < might want to make this variable
+		alpha_squared = pow(new_read.a, upow); // parameterizing the alpha power
 
       // it's a over b, where a is the new sample and b is the current color, t_color
       t_color.rgb = new_read.rgb * alpha_squared + t_color.rgb * t_color.a * ( 1 - alpha_squared );

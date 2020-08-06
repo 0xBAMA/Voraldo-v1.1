@@ -13,13 +13,15 @@ void GLContainer::display_block()
     static float temp_scale;
     static float temp_theta;
     static float temp_phi;
+    static float acp; // alpha correction power
 
-    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi))
+    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi) || (acp != alpha_correction_power))
         redraw_flag = true;
 
     temp_scale = scale;
     temp_theta = theta;
     temp_phi = phi;
+    acp = alpha_correction_power;
 
 
     if(redraw_flag)
@@ -41,8 +43,12 @@ void GLContainer::display_block()
         // zoom parameter
         glUniform1f(glGetUniformLocation(display_compute_shader, "scale"), scale);
 
-        // clear color
-        glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
+        // alpha power
+        glUniform1f(glGetUniformLocation(display_compute_shader, "upow"), alpha_correction_power);
+
+
+        // clear color - should be writing transparency instead
+        // glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
 
         // loop through tiles
         for(int x = 0; x < SSFACTOR*screen_width; x += TILESIZE)
@@ -441,16 +447,16 @@ void GLContainer::load_textures()
             }
 
 
-    for(unsigned int y = 0; y < (screen_height*SSFACTOR); y++)
-        for(unsigned int x = 0; x < (screen_width*SSFACTOR); x++)
-        {
-            random.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
-            random.push_back(y);
-            random.push_back(distribution(generator));
-            random.push_back(255);
-        }
+    // for(unsigned int y = 0; y < (screen_height*SSFACTOR); y++)
+    //     for(unsigned int x = 0; x < (screen_width*SSFACTOR); x++)
+    //     {
+    //         random.push_back((unsigned char)(x%256) ^ (unsigned char)(y%256));
+    //         random.push_back(y);
+    //         random.push_back(distribution(generator));
+    //         random.push_back(255);
+    //     }
 
-
+    random.resize(4*screen_height*screen_width*SSFACTOR*SSFACTOR);
     light.resize(3*DIM*DIM*DIM, 64); // fill the array with '64'
     zeroes.resize(3*DIM*DIM*DIM, 0); // fill the array with zeroes
 
