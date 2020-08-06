@@ -14,15 +14,16 @@ void GLContainer::display_block()
     static float temp_theta;
     static float temp_phi;
     static float acp; // alpha correction power
+    static glm::vec4 temp_clear_color;
 
-    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi) || (acp != alpha_correction_power))
+    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi) || (acp != alpha_correction_power) || (clear_color != temp_clear_color))
         redraw_flag = true;
 
     temp_scale = scale;
     temp_theta = theta;
     temp_phi = phi;
     acp = alpha_correction_power;
-
+    temp_clear_color = clear_color;
 
     if(redraw_flag)
     {
@@ -43,12 +44,11 @@ void GLContainer::display_block()
         // zoom parameter
         glUniform1f(glGetUniformLocation(display_compute_shader, "scale"), scale);
 
+        // clear color
+        glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
+
         // alpha power
         glUniform1f(glGetUniformLocation(display_compute_shader, "upow"), alpha_correction_power);
-
-
-        // clear color - should be writing transparency instead
-        // glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
 
         // loop through tiles
         for(int x = 0; x < SSFACTOR*screen_width; x += TILESIZE)
@@ -134,7 +134,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     // compiling compute shaders - note that ___.cs.glsl is just a placeholder with the bare minimum to compile
 
     // Shapes
-    aabb_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
+    aabb_compute                 = CShader("resources/code/shaders/aabb.cs.glsl").Program;
     cuboid_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
     cylinder_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
     ellipsoid_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -597,7 +597,7 @@ void GLContainer::load_textures()
 void GLContainer::swap_blocks()
 {
     // keep the data from moving
-    tex_offset = tex_offset ? 0 : 1; // because the blocks are in neighboring units, adding this value
+    tex_offset = tex_offset==1 ? 0 : 1; // because the blocks are in neighboring units, adding this value
                                      // to the number of the lower unit works to switch between them
 }
 
@@ -607,7 +607,28 @@ void GLContainer::swap_blocks()
        // aabb
 void GLContainer::draw_aabb(glm::vec3 min, glm::vec3 max, glm::vec4 color, bool draw, bool mask)
 {
+    // need to redraw after this is done
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(aabb_compute);
+
+    // Uniforms
+    glUniform1i(glGetUniformLocation(aabb_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(aabb_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(aabb_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform3fv(glGetUniformLocation(aabb_compute, "mins"), 1, glm::value_ptr(min));
+    glUniform3fv(glGetUniformLocation(aabb_compute, "maxs"), 1, glm::value_ptr(max));
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(aabb_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // cuboid
