@@ -137,13 +137,13 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     aabb_compute                 = CShader("resources/code/shaders/aabb.cs.glsl").Program;
     cuboid_compute               = CShader("resources/code/shaders/cuboid.cs.glsl").Program;
     cylinder_compute             = CShader("resources/code/shaders/cylinder.cs.glsl").Program;
-    ellipsoid_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
-    grid_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
-    heightmap_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
-    perlin_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
-    sphere_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
-    tube_compute                 = CShader("resources/code/shaders/___.cs.glsl").Program;
-    triangle_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+    ellipsoid_compute            = CShader("resources/code/shaders/ellipsoid.cs.glsl").Program;
+    grid_compute                 = CShader("resources/code/shaders/grid.cs.glsl").Program;
+    heightmap_compute            = CShader("resources/code/shaders/heightmap.cs.glsl").Program;
+    perlin_compute               = CShader("resources/code/shaders/perlin.cs.glsl").Program;
+    sphere_compute               = CShader("resources/code/shaders/sphere.cs.glsl").Program;
+    tube_compute                 = CShader("resources/code/shaders/tube.cs.glsl").Program;
+    triangle_compute             = CShader("resources/code/shaders/triangle.cs.glsl").Program;
 
     // GPU-side utilities
     clear_all_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -691,43 +691,186 @@ void GLContainer::draw_cylinder(glm::vec3 bvec, glm::vec3 tvec, float radius, gl
        // ellipsoid
 void GLContainer::draw_ellipsoid(glm::vec3 center, glm::vec3 radii, glm::vec3 rotation, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(ellipsoid_compute);
+
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(ellipsoid_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform3fv(glGetUniformLocation(ellipsoid_compute, "radii"), 1, glm::value_ptr(radii));
+    glUniform3fv(glGetUniformLocation(ellipsoid_compute, "rotation"), 1, glm::value_ptr(rotation));
+    glUniform3fv(glGetUniformLocation(ellipsoid_compute, "center"), 1, glm::value_ptr(center));
+
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(ellipsoid_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // grid
 void GLContainer::draw_grid(glm::ivec3 spacing, glm::ivec3 widths, glm::ivec3 offsets, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(grid_compute);
+
+    glUniform1i(glGetUniformLocation(grid_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(grid_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(grid_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform3i(glGetUniformLocation(grid_compute, "spacing"), spacing.x, spacing.y, spacing.z);
+    glUniform3i(glGetUniformLocation(grid_compute, "offsets"), offsets.x, offsets.y, offsets.z);
+    glUniform3i(glGetUniformLocation(grid_compute, "width"), widths.x, widths.y, widths.z);
+
+    glUniform1i(glGetUniformLocation(grid_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(grid_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(grid_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(grid_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // heightmap
 void GLContainer::draw_heightmap(float height_scale, bool height_color, glm::vec4 color, bool mask, bool draw)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(heightmap_compute);
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(heightmap_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "height_color"), height_color);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "map"), 12);
+    glUniform1f(glGetUniformLocation(heightmap_compute, "vscale"), height_scale);
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // perlin noise
 void GLContainer::draw_perlin_noise(float low_thresh, float high_thresh, bool smooth, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(perlin_compute);
+
+    glUniform1i(glGetUniformLocation(perlin_compute, "usmooth"), smooth);
+
+    glUniform1i(glGetUniformLocation(perlin_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(perlin_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(perlin_compute, "ucolor"), 1, glm::value_ptr(color));
+
+    glUniform1i(glGetUniformLocation(perlin_compute, "tex"), 11);
+
+    glUniform1f(glGetUniformLocation(perlin_compute, "low_thresh"), low_thresh);
+    glUniform1f(glGetUniformLocation(perlin_compute, "high_thresh"), high_thresh);
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(heightmap_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(heightmap_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // sphere
 void GLContainer::draw_sphere(glm::vec3 location, float radius, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(sphere_compute);
+
+    glUniform1i(glGetUniformLocation(sphere_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(sphere_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(sphere_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform1fv(glGetUniformLocation(sphere_compute, "radius"), 1, &radius);
+    glUniform3fv(glGetUniformLocation(sphere_compute, "location"), 1, glm::value_ptr(location));
+
+    glUniform1i(glGetUniformLocation(sphere_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(sphere_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(sphere_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(sphere_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // tube
 void GLContainer::draw_tube(glm::vec3 bvec, glm::vec3 tvec, float inner_radius, float outer_radius, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(tube_compute);
+
+    glUniform1i(glGetUniformLocation(tube_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(tube_compute, "draw"), draw);
+    glUniform1fv(glGetUniformLocation(tube_compute, "iradius"), 1, &inner_radius);
+    glUniform1fv(glGetUniformLocation(tube_compute, "oradius"), 1, &outer_radius);
+    glUniform3fv(glGetUniformLocation(tube_compute, "bvec"), 1, glm::value_ptr(bvec));
+    glUniform3fv(glGetUniformLocation(tube_compute, "tvec"), 1, glm::value_ptr(tvec));
+    glUniform4fv(glGetUniformLocation(tube_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform1i(glGetUniformLocation(tube_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(tube_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(tube_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(tube_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
        // triangle
 void GLContainer::draw_triangle(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3, float thickness, glm::vec4 color, bool draw, bool mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(triangle_compute);
+
+    glUniform1i(glGetUniformLocation(triangle_compute, "mask"), mask);
+    glUniform1i(glGetUniformLocation(triangle_compute, "draw"), draw);
+    glUniform4fv(glGetUniformLocation(triangle_compute, "color"), 1, glm::value_ptr(color));
+
+    glUniform1fv(glGetUniformLocation(triangle_compute, "thickness"), 1, &thickness);
+    glUniform3fv(glGetUniformLocation(triangle_compute, "point1"), 1, glm::value_ptr(point1));
+    glUniform3fv(glGetUniformLocation(triangle_compute, "point2"), 1, glm::value_ptr(point2));
+    glUniform3fv(glGetUniformLocation(triangle_compute, "point3"), 1, glm::value_ptr(point3));
+
+    glUniform1i(glGetUniformLocation(triangle_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(triangle_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(triangle_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(triangle_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
 
@@ -948,7 +1091,7 @@ void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, f
     glGenerateMipmap(GL_TEXTURE_3D);
 }
 
-// VAT and Load will need a shader, that can copy and respect the mask - save is more trivial
+// VAT and Load will need a shader, that can copy and respect the mask - save is more trivial, just read out the buffer and save it, same as last time
 
    // Brent Werness's Voxel Automata Terrain - set redraw_flag to true
 std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
