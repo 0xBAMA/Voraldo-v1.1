@@ -1670,7 +1670,8 @@ void Voraldo::draw_everything()
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
             pquit = true;
 
-        if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
+        // if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
+        if (event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE)
             pquit = true;
 
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_UP)

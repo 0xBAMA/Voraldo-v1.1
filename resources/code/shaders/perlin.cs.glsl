@@ -27,10 +27,14 @@ bool in_shape()
   //code to see if gl_GlobalInvocationID.xyz is inside the shape
   vec4 texread = texture(tex, gl_GlobalInvocationID.xyz/256.0);   
   if(usmooth)
-      color = ucolor * texread.r;
-  else
+  {
       color = ucolor;
-
+      color.rgb *= texread.r;
+  }
+  else
+  {
+      color = ucolor;
+	}
 
 
 

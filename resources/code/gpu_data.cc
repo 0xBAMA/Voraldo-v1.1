@@ -146,13 +146,13 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     triangle_compute             = CShader("resources/code/shaders/triangle.cs.glsl").Program;
 
     // GPU-side utilities
-    clear_all_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
-    unmask_all_compute           = CShader("resources/code/shaders/___.cs.glsl").Program;
-    invert_mask_compute          = CShader("resources/code/shaders/___.cs.glsl").Program;
-    mask_by_color_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
-    box_blur_compute             = CShader("resources/code/shaders/___.cs.glsl").Program;
+    clear_all_compute            = CShader("resources/code/shaders/clear_all.cs.glsl").Program;
+    unmask_all_compute           = CShader("resources/code/shaders/unmask_all.cs.glsl").Program;
+    invert_mask_compute          = CShader("resources/code/shaders/invert_mask.cs.glsl").Program;
+    mask_by_color_compute        = CShader("resources/code/shaders/mask_by_color.cs.glsl").Program;
+    box_blur_compute             = CShader("resources/code/shaders/box_blur.cs.glsl").Program;
     gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
-    shift_compute                = CShader("resources/code/shaders/___.cs.glsl").Program;
+    shift_compute                = CShader("resources/code/shaders/shift.cs.glsl").Program;
     copy_loadbuff_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
 
     // Lighting
@@ -880,82 +880,184 @@ void GLContainer::draw_triangle(glm::vec3 point1, glm::vec3 point2, glm::vec3 po
         // clear all
 void GLContainer::clear_all(bool respect_mask)
 {
+    redraw_flag = true;
 
+    swap_blocks();
+    glUseProgram(clear_all_compute);
+
+    glUniform1i(glGetUniformLocation(clear_all_compute, "respect_mask"), respect_mask);
+
+    glUniform1i(glGetUniformLocation(clear_all_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(clear_all_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(clear_all_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(clear_all_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // unmask all
 void GLContainer::unmask_all()
 {
+    // don't need to redraw
+    swap_blocks();
+    glUseProgram(unmask_all_compute);
 
+    glUniform1i(glGetUniformLocation(unmask_all_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(unmask_all_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(unmask_all_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(unmask_all_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // invert mask
 void GLContainer::invert_mask()
 {
+    // don't need to redraw
+    swap_blocks();
+    glUseProgram(invert_mask_compute);
 
+    glUniform1i(glGetUniformLocation(invert_mask_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(invert_mask_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(invert_mask_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(invert_mask_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // mask by color
 void GLContainer::mask_by_color(bool r, bool g, bool b, bool a, bool l, glm::vec4 color, float l_val, float r_var, float g_var, float b_var, float a_var, float l_var)
 {
+    // don't need to redraw
+    swap_blocks();
+    glUseProgram(mask_by_color_compute);
+ 
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "use_r"), r);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "use_g"), g);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "use_b"), b);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "use_a"), a);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "use_l"), l);
 
+    glUniform4fv(glGetUniformLocation(mask_by_color_compute, "color"), 1, glm::value_ptr(color));
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "l_val"), l_val);
+
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "r_var"), r_var);
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "g_var"), g_var);
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "b_var"), b_var);
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "a_var"), a_var);
+    glUniform1f(glGetUniformLocation(mask_by_color_compute, "l_var"), l_var);
+
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "lighting"), 6);
+
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(mask_by_color_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // box blur
 void GLContainer::box_blur(int radius, bool touch_alpha, bool respect_mask)
 {
+    redraw_flag = true;
+    swap_blocks();
+    glUseProgram(box_blur_compute);
 
+    glUniform1i(glGetUniformLocation(box_blur_compute, "radius"), radius);
+    glUniform1i(glGetUniformLocation(box_blur_compute, "respect_mask"), respect_mask);
+    glUniform1i(glGetUniformLocation(box_blur_compute, "touch_alpha"), touch_alpha);
+
+    glUniform1i(glGetUniformLocation(box_blur_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(box_blur_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(box_blur_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(box_blur_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // gaussian blur
 void GLContainer::gaussian_blur(int radius, bool touch_alpha, bool respect_mask)
 {
+    redraw_flag = true;
 
 }
 
         // limiter
 void GLContainer::limiter()
 {
+    redraw_flag = true;
 
 }
 
         // shifting
 void GLContainer::shift(glm::ivec3 movement, bool loop, int mode)
 {
+    redraw_flag = true;
+    swap_blocks();
 
+    glUseProgram(shift_compute);
+
+    glUniform1i(glGetUniformLocation(shift_compute, "loop"), loop);
+    glUniform1i(glGetUniformLocation(shift_compute, "mode"),  mode);
+    glUniform3i(glGetUniformLocation(shift_compute, "movement"), movement.x, movement.y, movement.z);
+
+    glUniform1i(glGetUniformLocation(shift_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(shift_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(shift_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(shift_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
 
 // ------------------------
-// Lighting -- most of these will require redraw_flag be set true
+// Lighting -- all of these will require redraw_flag be set true
 
         // lighting clear (to cached level, or to some set level, default zero)
 void GLContainer::lighting_clear(bool use_cache_level, float intensity)
 {
+    redraw_flag = true;
 
 }
 
         // directional
 void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity)
 {
+    redraw_flag = true;
 
 }
 
         // ambient occlusion
 void GLContainer::compute_ambient_occlusion(int radius)
 {
+    redraw_flag = true;
 
 }
 
         // fake GI
 void GLContainer::compute_fake_GI(float factor, float sky_intensity, float thresh)
 {
+    redraw_flag = true;
 
 }
 
         // mash (combine light into color buffer)
 void GLContainer::mash()
 {
+    redraw_flag = true;
 
 }
 
@@ -1096,18 +1198,110 @@ void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, f
    // Brent Werness's Voxel Automata Terrain - set redraw_flag to true
 std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
 {
-    std::string temp;
-    return temp;
+    redraw_flag = true;
+
+    int dimension;
+
+    // this is the easiest way I thought to handle the dimension
+
+    if(DIM == 32)
+        dimension = 5;
+    else if(DIM == 64)
+        dimension = 6;
+    else if(DIM == 128)
+        dimension = 7;
+    else if(DIM == 256)
+        dimension = 8;
+    else if(DIM == 512)
+        dimension = 9;
+
+    // check for equality with 'r' or 'i' to do random or isingRandom, else interpret as a shortrule
+    // I want to add different init modes, to seed multiple faces instead of just the one
+    voxel_automata_terrain v(dimension, flip, rule, initmode, lambda, beta, mag);
+
+    // pull out the texture data
+    std::vector<unsigned char> loaded_bytes; // used the same way as load(), below
+
+    // triple for-loop to pull the data out
+    for (int x = 0; x < DIM; x++)
+    {
+        for (int y = 0; y < DIM; y++)
+        {
+            for (int z = 0; z < DIM; z++)
+            {
+                // append data with the colors specified as input
+                glm::vec4 color;
+                switch (v.state[x][y][z])
+                {
+                    case 0: color = color0; break; // use color0
+                    case 1: color = color1; break; // use color1
+                    case 2: color = color2; break; // use color2
+
+                    default: color = color0; break; // this shouldn't come up, but the compiler was mad
+                }
+
+                // put it in the vector as bytes
+                loaded_bytes.push_back(static_cast<unsigned char>(color.x * 255));
+                loaded_bytes.push_back(static_cast<unsigned char>(color.y * 255));
+                loaded_bytes.push_back(static_cast<unsigned char>(color.z * 255));
+                loaded_bytes.push_back(static_cast<unsigned char>(color.w * 255));
+            }
+        }
+    }
+
+    // send it
+    // glBindTexture(GL_TEXTURE_3D, block_textures[location_of_current]); // use the specified ID
+    // glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &loaded_bytes[0]);
+
+    // need to set up the copy_loadbuff shader, with option to respect mask
+
+
+    // get the rule out of v
+    return v.getShortRule();
 }
 
    // load - set redraw_flag to true
 void GLContainer::load(std::string filename, bool respect_mask)
 {
+    redraw_flag = true;
+
+    std::vector<unsigned char> image_loaded_bytes;
+    unsigned width, height;
+
+    unsigned error = lodepng::decode(image_loaded_bytes, width, height, filename.c_str());
+
+    //report any errors
+    if(error) std::cout << "decode error during load(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl;
+
+    //put that shit in the front buffer with glTexImage3D()
+    // glBindTexture(GL_TEXTURE_3D, block_textures[location_of_current]); // use the specified ID
+    // glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &image_loaded_bytes[0]);
+
+    // need to set up the copy_loadbuff shader, again with option to respect mask
+
+    cout << "filename on load is: " << filename << std::endl << std::endl;
 
 }
 
    // save
 void GLContainer::save(std::string filename)
 {
+    // don't need to redraw
+    std::vector<unsigned char> image_bytes_to_save;
+    unsigned width, height;
 
+    width = DIM;
+    height = DIM*DIM;
+
+    image_bytes_to_save.resize(4*DIM*DIM*DIM);
+    filename = std::string("saves/") + filename;
+
+    //get that shit from the front buffer with glGetTexImage(), put it in image_bytes_to_save
+    glGetTextureImage( 2+tex_offset, 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
+
+    unsigned error = lodepng::encode(filename.c_str(), image_bytes_to_save, width, height);
+
+    if(error) std::cout << "decode error during save(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl;
+
+    cout << "filename on save is: " << filename << std::endl << std::endl;
 }
