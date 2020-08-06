@@ -1529,16 +1529,78 @@ void Voraldo::ControlWindow(bool *open)
 
                     ImGui::EndTabItem();
                 }
+
                 ImGui::EndTabBar();
-
                 ImGui::EndTabItem();
-
             }
 
         }
-        if (ImGui::BeginTabItem("Instructions"))
+
+        if (ImGui::BeginTabItem(" Render Settings "))
         {
-            cout << "size is " << windowsize.x << " " << windowsize.y << endl;
+            // adjust postition of orientation widget, move it in x, y and z
+            static glm::vec3 offset = glm::vec3(0.9, -0.74, 0.0);
+
+            ImGui::Text("Move the orientation widget.");
+
+            ImGui::SliderFloat("offset x", &offset.x, -1, 1);
+            ImGui::SliderFloat("offset y", &offset.y, -1, 1);
+
+            GPU_Data.orientation_widget_offset = offset;
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            ImGui::Separator();
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            // adjust power on alpha correction - make sure to set GPU_Data.redraw_flag if it changes
+            ImGui::Text("This is the correction factor for the alpha channel.");
+
+            ImGui::SliderFloat("alpha correction power", &GPU_Data.alpha_correction_power, 0.5, 2.5);
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            ImGui::Separator();
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            // slider control over phi, theta, scale
+            ImGui::Text("Control over display parameters.");
+
+            ImGui::SliderFloat("theta", &GPU_Data.theta, -3.14f, 3.14f, "%.3f");
+            ImGui::SliderFloat("phi", &GPU_Data.phi, -3.14f, 3.14f, "%.3f");
+            ImGui::Text(" ");
+            ImGui::SliderFloat("scale", &GPU_Data.scale, 0.0f, 10.0f, "%.3f");
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            ImGui::Separator();
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            // adjusting the clear color
+            ImGui::Text("Set up OpenGL clear color.");
+
+            ImGui::ColorEdit3("", (float*)&clear_color); // Edit 3 floats representing a color
+            GPU_Data.clear_color = glm::vec4(clear_color.x, clear_color.y, clear_color.z, 1.0);
+
+
+
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem(" Instructions "))
+        {
+            // need to figure out what basic info I want to relay to the user
+            // cout << "size is " << windowsize.x << " " << windowsize.y << endl;
+            // need to set up wrapping based on windowsize.x
             ImGui::EndTabItem();
         }
 
@@ -1626,6 +1688,8 @@ void Voraldo::draw_everything()
 
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_m)
             show_menu = !show_menu;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_c)
+            show_controls = !show_controls;
 
         // specific directions
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)

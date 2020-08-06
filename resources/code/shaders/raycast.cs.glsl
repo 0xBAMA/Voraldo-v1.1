@@ -23,7 +23,7 @@ double tmin, tmax; //global scope, set in hit() to tell min and max parameters
 // #define NUM_STEPS 500
 #define NUM_STEPS 780
 #define MIN_DISTANCE 0.0
-#define MAX_DISTANCE 10.0
+#define MAX_DISTANCE 5.0
 
 
 // the display texture
@@ -98,8 +98,8 @@ bool hit(vec3 org, vec3 dir)
 vec4 get_color_for_pixel(vec3 org, vec3 dir)
 {
   float current_t = float(tmax);
-  // vec4 t_color = vec4(0);
-  vec4 t_color = clear_color;
+  vec4 t_color = vec4(0);
+  // vec4 t_color = clear_color;
 
   float step = float((tmax-tmin))/NUM_STEPS;
   if(step < 0.001f)
@@ -169,7 +169,7 @@ void main()
 		}
 		else
 		{
-			imageStore(current, Global_Loc, clear_color);
+			imageStore(current, Global_Loc, vec4(0));
 		}
 	}  // else, this part of the tile falls outside of the image bounds, no operation should take place
 }

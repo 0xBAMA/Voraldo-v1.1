@@ -21,6 +21,7 @@ void GLContainer::display_block()
     temp_theta = theta;
     temp_phi = phi;
 
+
     if(redraw_flag)
     {
         // cout << "redrawing" << endl;
@@ -63,6 +64,9 @@ void GLContainer::display_block()
         redraw_flag = false; // we won't need to draw anything again, till something changes
     }
 
+    // clear the screen
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);   //from hsv picker
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                     //clear the background
 
     // ------------------------
     // display shader takes texture and blits it to the screen
@@ -98,6 +102,8 @@ void GLContainer::display_orientation_widget()
     glUniform1f(glGetUniformLocation(orientation_widget_shader, "phi"), phi);
     glUniform1f(glGetUniformLocation(orientation_widget_shader, "ratio"), io.DisplaySize.x/io.DisplaySize.y);
 
+    glUniform3fv(glGetUniformLocation(orientation_widget_shader, "offset"), 1, glm::value_ptr(orientation_widget_offset));
+
     // 4 cubes, 6 faces apiece, 2 triangles per face - total is 144 verticies
     glDrawArrays( GL_TRIANGLES, 0, 144);
 
@@ -108,7 +114,9 @@ void GLContainer::display_orientation_widget()
 // ------------------------
 // initialization functions
 void GLContainer::compile_shaders() // going to make this more compact this time around
-{
+{ // reporting status is not super important, just compile them - may add some code to the
+  // shader class (and cshader class) to report the filename upon unsuccessful compilation
+
     // ------------------------
     // compiling display shaders
 
@@ -426,10 +434,10 @@ void GLContainer::load_textures()
         for(unsigned int y = 0; y < DIM; y++)
             for(unsigned int z = 0; z < DIM; z++)
             {
-                for(int i = 0; i < 3; i++) // fill r, g, b with the result of the xor
+                for(int i = 0; i < 4; i++) // fill r, g, b with the result of the xor
                     ucxor.push_back(((unsigned char)(x%256) ^ (unsigned char)(y%256) ^ (unsigned char)(z%256)));
 
-                ucxor.push_back(255); // alpha channel gets 255
+                // ucxor.push_back(distribution(generator)); // alpha channel gets 255
             }
 
 

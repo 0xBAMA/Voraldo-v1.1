@@ -12,6 +12,8 @@ uniform float theta;
 uniform float phi;
 uniform float ratio;
 
+uniform vec3 offset;
+
 //thanks to Neil Mendoza via http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
 mat3 rotationMatrix(vec3 axis, float angle)
 {
@@ -38,7 +40,7 @@ void main()
 	vpos = 0.2 * (rotphi * rottheta * vPosition);
 	
 	vpos.x /= ratio;
-	vpos += vec3(0.875, -0.725, 0.0);
+	vpos += offset;
 
 	gl_Position = vec4(vpos, 1.0);
 }

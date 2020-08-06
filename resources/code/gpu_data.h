@@ -124,8 +124,13 @@ class GLContainer
         // OpenGL clear color
         glm::vec4 clear_color;
 
+        // move the orientation widget around
+        glm::vec3 orientation_widget_offset = glm::vec3(0.9, -0.74, 0.0);
+
         // display parameters - public so they can be manipulated
         float scale = 7.0f, theta = 0.0f, phi = 0.0f;
+
+        float alpha_correction_power = 2.0;
 
         unsigned int screen_width, screen_height;
 
