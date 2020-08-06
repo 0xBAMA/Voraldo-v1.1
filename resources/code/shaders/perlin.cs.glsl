@@ -25,7 +25,7 @@ uniform bool mask;      //this this shape be masked?
 bool in_shape()
 {
   //code to see if gl_GlobalInvocationID.xyz is inside the shape
-  vec4 texread = texture(tex, gl_GlobalInvocationID.xyz/256.0);   
+  vec4 texread = texture(tex, vec3(gl_GlobalInvocationID.xyz)/256.0);   
   if(usmooth)
   {
       color = ucolor;
