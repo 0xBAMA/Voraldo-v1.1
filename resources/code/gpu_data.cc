@@ -153,10 +153,10 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     box_blur_compute             = CShader("resources/code/shaders/box_blur.cs.glsl").Program;
     gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
     shift_compute                = CShader("resources/code/shaders/shift.cs.glsl").Program;
-    copy_loadbuff_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
+    copy_loadbuff_compute        = CShader("resources/code/shaders/copy_loadbuff.cs.glsl").Program;
 
     // Lighting
-    lighting_clear_compute       = CShader("resources/code/shaders/___.cs.glsl").Program;
+    lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;
     directional_lighting_compute = CShader("resources/code/shaders/___.cs.glsl").Program;
     ambient_occlusion_compute    = CShader("resources/code/shaders/___.cs.glsl").Program;
     fakeGI_compute               = CShader("resources/code/shaders/___.cs.glsl").Program;
@@ -991,6 +991,7 @@ void GLContainer::gaussian_blur(int radius, bool touch_alpha, bool respect_mask)
 {
     redraw_flag = true;
 
+    // I think I'm going to restrict the range of radii, since I'm not sure about what the best way to do different sized kernels is
 }
 
         // limiter
@@ -998,6 +999,7 @@ void GLContainer::limiter()
 {
     redraw_flag = true;
 
+    // the details of this operation still need to be worked out - there is a couple of different modes
 }
 
         // shifting
@@ -1031,6 +1033,15 @@ void GLContainer::lighting_clear(bool use_cache_level, float intensity)
 {
     redraw_flag = true;
 
+    glUseProgram(lighting_clear_compute);
+
+    glUniform1i(glGetUniformLocation(lighting_clear_compute, "lighting"), 6);
+    glUniform1i(glGetUniformLocation(lighting_clear_compute, "lighting_cache"), 7);
+    glUniform1i(glGetUniformLocation(lighting_clear_compute, "use_cache"), use_cache_level);
+    glUniform1f(glGetUniformLocation(lighting_clear_compute, "intensity"), intensity);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // directional
@@ -1194,6 +1205,26 @@ void GLContainer::generate_perlin_noise(float xscale=0.014, float yscale=0.04, f
 }
 
 // VAT and Load will need a shader, that can copy and respect the mask - save is more trivial, just read out the buffer and save it, same as last time
+void GLContainer::copy_loadbuffer(bool respect_mask)
+{
+    redraw_flag = true;
+    swap_blocks();
+    glUseProgram(copy_loadbuff_compute);
+
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "respect_mask"), respect_mask);
+
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "previous_mask"), 5-tex_offset);
+
+    glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "loadbuff"), 10);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+}
+
 
    // Brent Werness's Voxel Automata Terrain - set redraw_flag to true
 std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
@@ -1202,7 +1233,7 @@ std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::ve
 
     int dimension;
 
-    // this is the easiest way I thought to handle the dimension
+    // this is the easiest way to handle the dimension I think
 
     if(DIM == 32)
         dimension = 5;
@@ -1245,16 +1276,19 @@ std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::ve
                 loaded_bytes.push_back(static_cast<unsigned char>(color.y * 255));
                 loaded_bytes.push_back(static_cast<unsigned char>(color.z * 255));
                 loaded_bytes.push_back(static_cast<unsigned char>(color.w * 255));
+
+                // cout << v.state[x][y][z] << " ";
             }
+            // cout << endl;
         }
+        // cout << endl;
     }
 
     // send it
-    // glBindTexture(GL_TEXTURE_3D, block_textures[location_of_current]); // use the specified ID
-    // glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &loaded_bytes[0]);
+    glBindTexture(GL_TEXTURE_3D, textures[10]); // put it in the loadbuffer
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &loaded_bytes[0]);
 
-    // need to set up the copy_loadbuff shader, with option to respect mask
-
+    copy_loadbuffer(respect_mask);
 
     // get the rule out of v
     return v.getShortRule();
@@ -1274,10 +1308,10 @@ void GLContainer::load(std::string filename, bool respect_mask)
     if(error) std::cout << "decode error during load(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl;
 
     //put that shit in the front buffer with glTexImage3D()
-    // glBindTexture(GL_TEXTURE_3D, block_textures[location_of_current]); // use the specified ID
-    // glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &image_loaded_bytes[0]);
+    glBindTexture(GL_TEXTURE_3D, textures[10]); // put it in the loadbuffer
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, DIM, DIM, DIM, 0,  GL_RGBA, GL_UNSIGNED_BYTE, &image_loaded_bytes[0]);
 
-    // need to set up the copy_loadbuff shader, again with option to respect mask
+    copy_loadbuffer(respect_mask);
 
     cout << "filename on load is: " << filename << std::endl << std::endl;
 

@@ -109,6 +109,10 @@ class GLContainer
         // generate 3d perlin noise & buffer to the GPU
         void generate_perlin_noise(float xscale, float yscale, float zscale);
 
+
+        // this is a helper function, called by both VAT and Load
+        void copy_loadbuffer(bool respect_mask);
+
         // Brent Werness's Voxel Automata Terrain
         std::string vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask);
 

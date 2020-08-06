@@ -9,6 +9,8 @@ uniform layout(r8) image3D previous_mask;  //now-current values of the mask
 uniform layout(rgba8) image3D current;        //values of the block after the update
 uniform layout(r8) image3D current_mask;   //values of the mask after the update
 
+uniform layout(rgba8) image3D loadbuff;   // the loadbuffer, generally containg data from the CPU
+
 uniform bool respect_mask;         //when clearing, should you touch the masked cells?
 //true means you will not touch the masked cells, false means you will indeed clear all
 
@@ -19,6 +21,7 @@ void main()
 {
   bool pmask = (imageLoad(previous_mask, ivec3(gl_GlobalInvocationID.xyz)).r > 0.5);  //existing mask value (previous_mask = 0?)
   vec4 pcol = imageLoad(previous, ivec3(gl_GlobalInvocationID.xyz));                 //existing color value (what is the previous color?)
+	vec4 lbcontent = imageLoad(loadbuff, ivec3(gl_GlobalInvocationID.xyz));
 
   if(pmask && respect_mask) //the cell was masked
   {
@@ -27,7 +30,7 @@ void main()
   }
   else
   {
-    imageStore(current, ivec3(gl_GlobalInvocationID.xyz), vec4(0,0,0,0));
+    imageStore(current, ivec3(gl_GlobalInvocationID.xyz), lbcontent);
     imageStore(current_mask, ivec3(gl_GlobalInvocationID.xyz), pmask?vec4(1):vec4(0));
   }
 }

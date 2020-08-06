@@ -1416,6 +1416,7 @@ void Voraldo::ControlWindow(bool *open)
 
                     // need to break this up
                     static float clear_level;
+                    static bool use_cache;
 
                     static float directional_theta;
                     static float directional_phi;
@@ -1441,8 +1442,10 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text("Clear Level - 0.25 is neutral");
                     ImGui::SliderFloat("level", &clear_level, 0.0f, 1.0f, "%.3f");
 
+                    ImGui::Checkbox(" use cached levels ", &use_cache);
+
                     if (ImGui::Button("Clear", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
-                        GPU_Data.lighting_clear(clear_level);
+                        GPU_Data.lighting_clear(use_cache, clear_level);
 
                     ImGui::Separator();
 
