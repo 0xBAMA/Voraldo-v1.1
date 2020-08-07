@@ -138,6 +138,9 @@ void Voraldo::create_window()
     glClear( GL_COLOR_BUFFER_BIT );
     SDL_GL_SwapWindow( window );
 
+
+    update_listbox_items();
+    
     #define FPS_HISTORY_SIZE 95
     fps_history.resize(FPS_HISTORY_SIZE);   //initialize the array of fps values
 
