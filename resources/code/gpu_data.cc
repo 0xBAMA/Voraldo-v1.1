@@ -37,6 +37,8 @@ void GLContainer::display_block()
         glUniform1i(glGetUniformLocation(display_compute_shader, "block"),   2 + tex_offset);
         glUniform1i(glGetUniformLocation(display_compute_shader, "lighting"), 6);
 
+        cout << "displaying from " << 2+tex_offset << endl;
+
         // rotation parameters
         glUniform1f(glGetUniformLocation(display_compute_shader, "theta"), theta);
         glUniform1f(glGetUniformLocation(display_compute_shader, "phi"), phi);
@@ -1278,6 +1280,8 @@ void GLContainer::copy_loadbuffer(bool respect_mask)
 
     glUniform1i(glGetUniformLocation(copy_loadbuff_compute, "loadbuff"), 10);
 
+    cout << "loading into slot " << 2+tex_offset << endl;
+    
     glDispatchCompute( DIM/8, DIM/8, DIM/8 );
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
@@ -1291,7 +1295,6 @@ std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::ve
     int dimension;
 
     // this is the easiest way to handle the dimension I think
-
     if(DIM == 32)
         dimension = 5;
     else if(DIM == 64)
@@ -1371,7 +1374,6 @@ void GLContainer::load(std::string filename, bool respect_mask)
     copy_loadbuffer(respect_mask);
 
     cout << "filename on load is: " << filename << std::endl << std::endl;
-
 }
 
    // save
@@ -1388,14 +1390,22 @@ void GLContainer::save(std::string filename)
     filename = std::string("saves/") + filename;
 
     //get that shit from the front buffer with glGetTexImage(), put it in image_bytes_to_save
-    if(tex_offset == 0)
-        glGetTextureImage( 3, 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
-    else
-        glGetTextureImage( 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
-
+    // if(tex_offset == 0)
+    // {
+    //     cout << "saving from slot 3" << endl;
+    //     glGetTextureImage( 3, 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
+    // }
+    // else
+    // {
+    //     cout << "saving from slot 2" << endl;
+    //     glGetTextureImage( 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
+    // }
     
-    unsigned error = lodepng::encode(filename.c_str(), image_bytes_to_save, width, height);
+    cout << "saving from slot " << textures[2+tex_offset] << endl;
+    glGetTextureImage( textures[2+tex_offset], 0, GL_RGBA, GL_UNSIGNED_BYTE, 4*DIM*DIM*DIM, &image_bytes_to_save[0]);
 
+
+    unsigned error = lodepng::encode(filename.c_str(), image_bytes_to_save, width, height);
     if(error) std::cout << "encode error during save(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl;
 
     cout << "filename on save is: " << filename << std::endl << std::endl;

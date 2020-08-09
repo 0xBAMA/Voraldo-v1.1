@@ -19,18 +19,18 @@ vec4 mask_false = vec4(0.0,0.0,0.0,0.0);
 
 void main()
 {
-  bool pmask = (imageLoad(previous_mask, ivec3(gl_GlobalInvocationID.xyz)).r > 0.5);  //existing mask value (previous_mask = 0?)
-  vec4 pcol = imageLoad(previous, ivec3(gl_GlobalInvocationID.xyz));                 //existing color value (what is the previous color?)
+	bool pmask = (imageLoad(previous_mask, ivec3(gl_GlobalInvocationID.xyz)).r > 0.5);  //existing mask value (previous_mask = 0?)
+	vec4 pcol = imageLoad(previous, ivec3(gl_GlobalInvocationID.xyz));                 //existing color value (what is the previous color?)
 	vec4 lbcontent = imageLoad(loadbuff, ivec3(gl_GlobalInvocationID.xyz));
 
-  if(pmask && respect_mask) //the cell was masked
-  {
-    imageStore(current, ivec3(gl_GlobalInvocationID.xyz), pcol);  //color takes on previous color
-    imageStore(current_mask, ivec3(gl_GlobalInvocationID.xyz), mask_true);  //mask is set true
-  }
-  else
-  {
-    imageStore(current, ivec3(gl_GlobalInvocationID.xyz), lbcontent);
-    imageStore(current_mask, ivec3(gl_GlobalInvocationID.xyz), pmask?vec4(1):vec4(0));
-  }
+	if(pmask && respect_mask) //the cell was masked
+	{
+		imageStore(current, ivec3(gl_GlobalInvocationID.xyz), pcol);  //color takes on previous color
+		imageStore(current_mask, ivec3(gl_GlobalInvocationID.xyz), mask_true);  //mask is set true
+	}
+	else
+	{
+		imageStore(current, ivec3(gl_GlobalInvocationID.xyz), lbcontent);
+		imageStore(current_mask, ivec3(gl_GlobalInvocationID.xyz), pmask?vec4(1):vec4(0));
+	}
 }
