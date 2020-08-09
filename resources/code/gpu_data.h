@@ -18,6 +18,9 @@ class GLContainer
         bool show_widget = true;
         void display() { display_block(); if(show_widget) display_orientation_widget(); }
 
+        // part of the quitting operation
+        void delete_textures();
+        
         // manipulating the block
         void swap_blocks();
 

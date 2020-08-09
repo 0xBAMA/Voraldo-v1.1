@@ -1392,3 +1392,10 @@ void GLContainer::save(std::string filename)
 
     cout << "filename on save is: " << filename << std::endl << std::endl;
 }
+
+
+void GLContainer::delete_textures()
+{
+    // delete the textures
+   glDeleteTextures(13, &textures[0]); 
+}

@@ -468,19 +468,19 @@ void Voraldo::QuitConfirm(bool *open)
 
         ImGui::Text("Are you sure you want to quit?");
 
-        ImGui::Text("   ");
+        ImGui::Text("  ");
         ImGui::SameLine();
         
         // button to cancel -> set this window's bool to false
-        if(ImGui::Button("Cancel"))
+        if(ImGui::Button(" Cancel "))
             *open = false;
 
         ImGui::SameLine();
-        ImGui::Text("        ");
+        ImGui::Text("      ");
         ImGui::SameLine();
 
         // button to quit -> set pquit to true
-        if(ImGui::Button("Quit"))
+        if(ImGui::Button(" Quit "))
             pquit = true;
         
         ImGui::End();
@@ -1805,15 +1805,16 @@ void Voraldo::draw_everything()
 
 void Voraldo::quit()
 {
-  //shutdown everything
+  // delete textures
+  GPU_Data.delete_textures();
+    
+  // shutdown everything
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
 
-  //destroy window
+  // destroy window
   SDL_GL_DeleteContext(GLcontext);
   SDL_DestroyWindow(window);
   SDL_Quit();
-
-  cout << "goodbye." << endl;
 }
