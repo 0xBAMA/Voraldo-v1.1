@@ -27,13 +27,15 @@ class Voraldo
 		bool show_controls    = true;
 		bool show_demo_window = false;
 		bool show_menu        = true;
+		bool quit_confirm     = false;
 
 		void ControlWindow(bool *open);
 		void AppMainMenuBar(bool *open);
 		void ShowExampleMenuFile();
 		void FPSOverlay(bool* p_open);
 		void HelpMarker(const char* indicator, const char* desc);
-
+		void QuitConfirm(bool *open);
+		
 		void create_window();
 		void gl_setup();
 		void draw_everything();

@@ -455,6 +455,39 @@ void Voraldo::AppMainMenuBar(bool *open)
 }
 
 
+void Voraldo::QuitConfirm(bool *open)
+{
+    if(*open)
+    {
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration;
+        
+        // create centered window
+        ImGui::SetNextWindowPos(ImVec2(total_screen_width/2 - 120, total_screen_height/2 - 25));
+        ImGui::SetNextWindowSize(ImVec2(240, 50));
+        ImGui::Begin("quit", open, flags);
+
+        ImGui::Text("Are you sure you want to quit?");
+
+        ImGui::Text("   ");
+        ImGui::SameLine();
+        
+        // button to cancel -> set this window's bool to false
+        if(ImGui::Button("Cancel"))
+            *open = false;
+
+        ImGui::SameLine();
+        ImGui::Text("        ");
+        ImGui::SameLine();
+
+        // button to quit -> set pquit to true
+        if(ImGui::Button("Quit"))
+            pquit = true;
+        
+        ImGui::End();
+    }
+}
+
+
 void Voraldo::ControlWindow(bool *open)
 {
     if(*open)
@@ -1694,9 +1727,13 @@ void Voraldo::draw_everything()
     // do my own window
     ControlWindow(&show_controls);
 
+    // show quit confirm window
+    QuitConfirm(&quit_confirm);
+
     // show the demo window
     if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
+    
 
     // get the data go the GPU
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -1720,7 +1757,7 @@ void Voraldo::draw_everything()
 
         // if ((event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE) || (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1)) //x1 is browser back on the mouse
         if (event.type == SDL_KEYUP  && event.key.keysym.sym == SDLK_ESCAPE)
-            pquit = true;
+            quit_confirm = true;
 
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_UP)
             GPU_Data.phi  += 0.03f;     //increment phi
