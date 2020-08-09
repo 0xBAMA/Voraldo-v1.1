@@ -466,11 +466,6 @@ void Voraldo::ControlWindow(bool *open)
         ImGui::SetNextWindowSize(ImVec2(320,385), ImGuiCond_FirstUseEver);
         ImGui::Begin("Controls", open, flags);
 
-        if(ImGui::Button("manual swap"))
-        {
-            GPU_Data.swap_blocks();
-        }
-        
         ImVec2 windowsize = ImGui::GetWindowSize();
 
         // tabbed layout
