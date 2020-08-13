@@ -1533,6 +1533,11 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::SliderFloat("value", &directional_intensity, 0.0f, 1.0f, "%.3f");
                     ImGui::SliderFloat("decay", &decay_power, 0.0f, 3.0f, "%.3f");
 
+                    if (ImGui::Button("New Directional", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
+                        GPU_Data.compute_new_directional_lighting(directional_theta, directional_phi, directional_intensity, decay_power);
+
+                    ImGui::SameLine();
+                    
                     if (ImGui::Button("Apply Directional", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
                         GPU_Data.compute_directional_lighting(directional_theta, directional_phi, directional_intensity, decay_power);
 

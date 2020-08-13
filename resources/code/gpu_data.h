@@ -92,6 +92,7 @@ class GLContainer
 
         // directional
         void compute_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power);
+        void compute_new_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power);
 
         // ambient occlusion
         void compute_ambient_occlusion(int radius);
@@ -217,6 +218,7 @@ class GLContainer
 
         // Lighting
         GLuint lighting_clear_compute;
+        GLuint new_directional_lighting_compute;
         GLuint directional_lighting_compute;
         GLuint ambient_occlusion_compute;
         GLuint fakeGI_compute;

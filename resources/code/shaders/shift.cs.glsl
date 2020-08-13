@@ -9,6 +9,9 @@ uniform layout(r8) image3D previous_mask;  //now-current values of the mask
 uniform layout(rgba8) image3D current;        //values of the block after the update
 uniform layout(r8) image3D current_mask;   //values of the mask after the update
 
+uniform layout(r8) image3D lighting;  //wanted to make the lighting buffer shift with the
+// color buffer, but to do that I'm going to need a second lighting buffer
+
 uniform ivec3 movement;     //how much are you moving this current cell by? 
 uniform bool loop;          //does the data loop off the sides (toroid style)
 uniform int mode;           //will you respect the current value of the mask? this could get ambiguous but we'll deal
@@ -32,13 +35,23 @@ void main()
 
   bool pmask = (imageLoad(previous_mask, regular_pos).r > 0.5);  //existing mask value (previous_mask = 0?)
   bool psmask = (imageLoad(previous_mask, shifted_pos).r > 0.5);  //existing mask value (shifted)
+  
+  vec4 plight = imageLoad(lighting, regular_pos);
+  vec4 pslight = imageLoad(lighting, shifted_pos);
+  
   vec4 pcol = imageLoad(previous, regular_pos);    //existing color value (what is the previous color?)
   vec4 pscol = imageLoad(previous, shifted_pos);   //existing color value (shifted)
+  
+  
 
-    if(mode == 1)       //ignore mask buffer, move color data only (current_mask takes value of previous_mask)
+    if(mode == 1)       //ignore mask buffer, move color and light data only (current_mask takes value of previous_mask)
     {
-        //do the color shift
+        // do the color shift
         imageStore(current, regular_pos, pscol);
+        
+        // do the light shift
+        //imageStore(lighting, regular_pos, pslight);
+        
         //write the same value of mask back to current_mask
         imageStore(current_mask, regular_pos, pmask?mask_true:mask_false);
     }
@@ -49,12 +62,14 @@ void main()
         {
             //if yes, write previous color and mask_true
             imageStore(current, regular_pos, pcol);
+            //imageStore(lighting, regular_pos, plight);
             imageStore(current_mask, regular_pos, mask_true);
         }
         else
         {
             //if no, write shifted color, and mask_false 
             imageStore(current, regular_pos, pscol);
+            //imageStore(lighting, regular_pos, pslight);
             imageStore(current_mask, regular_pos, mask_false);
         }
     }
@@ -62,6 +77,10 @@ void main()
     {
         //do the color shift
         imageStore(current, regular_pos, pscol);
+        
+        // do the light shift
+        //imageStore(lighting, regular_pos, pslight);
+        
         //do the mask shift
         imageStore(current_mask, regular_pos, psmask?mask_true:mask_false);
     }

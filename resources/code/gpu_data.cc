@@ -160,6 +160,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     // Lighting
     lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;        cout << "light_clear shader done." << endl;
     directional_lighting_compute = CShader("resources/code/shaders/directional.cs.glsl").Program;        cout << "directional light shader done." << endl;
+    new_directional_lighting_compute = CShader("resources/code/shaders/new_directional.cs.glsl").Program;        cout << "new directional light shader done." << endl;
     ambient_occlusion_compute    = CShader("resources/code/shaders/ambient_occlusion.cs.glsl").Program;  cout << "ambient occlusion shader done." << endl;
     fakeGI_compute               = CShader("resources/code/shaders/fakeGI.cs.glsl").Program;             cout << "fake global illumination shader done." << endl;
     mash_compute                 = CShader("resources/code/shaders/mash.cs.glsl").Program;               cout << "lighting mash shader done." << endl;
@@ -1016,6 +1017,8 @@ void GLContainer::shift(glm::ivec3 movement, bool loop, int mode)
     glUniform1i(glGetUniformLocation(shift_compute, "mode"),  mode);
     glUniform3i(glGetUniformLocation(shift_compute, "movement"), movement.x, movement.y, movement.z);
 
+    // glUniform1i(glGetUniformLocation(shift_compute, "lighting"), 6);
+    
     glUniform1i(glGetUniformLocation(shift_compute, "current"), 2+tex_offset);
     glUniform1i(glGetUniformLocation(shift_compute, "current_mask"), 4+tex_offset);
 
@@ -1062,6 +1065,25 @@ void GLContainer::compute_directional_lighting(float theta, float phi, float ini
     glUniform1i(glGetUniformLocation(directional_lighting_compute, "lighting"), 6);
 
     glDispatchCompute( LIGHT_DIM/8, LIGHT_DIM/8, 1 ); //workgroup is 8x8x1, so divide x and y by 8
+
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+}
+
+void GLContainer::compute_new_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
+{
+    redraw_flag = true;
+    glUseProgram(new_directional_lighting_compute);
+
+    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "utheta"), theta);
+    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "uphi"), phi);
+    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "light_dim"), LIGHT_DIM);
+    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "light_intensity"), initial_ray_intensity);
+    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "decay_power"), decay_power);
+
+    glUniform1i(glGetUniformLocation(new_directional_lighting_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(new_directional_lighting_compute, "lighting"), 6);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 ); //workgroup is 8x8x8
 
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
