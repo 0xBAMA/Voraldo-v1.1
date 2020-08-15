@@ -88,67 +88,64 @@ bool hit(vec3 org, vec3 dir)
 }
 
 
-void traceray(vec3 org, vec3 dir)
+void traceray(vec3 dir)
 {
+	// the location you need to consider is specified by gl_GlobalInvocationID
 
-  float current_t = float(tmin);
-  float intensity = light_intensity; //initialize ray intensity
+	
 
-  float step = float((tmax-tmin))/NUM_STEPS;
-  if(step < 0.001f) step = 0.001f;
-   
-  ivec3 sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1))); 
 
-  vec4 new_color_read = imageLoad(current, sample_location);
-  vec4 new_light_read = imageLoad(lighting, sample_location);
+    vec3 org = (vec3(imageSize(lighting))/2.0f) *
 
-  //three termination conditions - number of steps, distance along the ray, intensity < 0
-  for(int i = 0; i < NUM_STEPS; i++)
-  {
-    if(current_t <= tmax && intensity > 0)
-    {
-        imageStore(lighting, sample_location, vec4(new_light_read.r+intensity));
 
-        //intensity -= new_color_read.a;
-        //intensity *= 1-pow(new_color_read.a, 2);
-        intensity *= 1-pow(new_color_read.a, decay_power);
 
-        current_t += step;
-        sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1))); 
+  // float current_t = float(tmin);
+  // float intensity = light_intensity; //initialize ray intensity
 
-        new_color_read = imageLoad(current, sample_location);
-        new_light_read = imageLoad(lighting, sample_location);
-    }
-  }
+  // float step = float((tmax-tmin))/NUM_STEPS;
+  // if(step < 0.001f) step = 0.001f;
+
+  // ivec3 sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1)));
+
+  // vec4 new_color_read = imageLoad(current, sample_location);
+  // vec4 new_light_read = imageLoad(lighting, sample_location);
+
+  // //three termination conditions - number of steps, distance along the ray, intensity < 0
+  // for(int i = 0; i < NUM_STEPS; i++)
+  // {
+  //   if(current_t <= tmax && intensity > 0)
+  //   {
+  //       imageStore(lighting, sample_location, vec4(new_light_read.r+intensity));
+
+  //       //intensity -= new_color_read.a;
+  //       //intensity *= 1-pow(new_color_read.a, 2);
+  //       intensity *= 1-pow(new_color_read.a, decay_power);
+
+  //       current_t += step;
+  //       sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1)));
+
+  //       new_color_read = imageLoad(current, sample_location);
+  //       new_light_read = imageLoad(lighting, sample_location);
+  //   }
+  // }
 }
 
 
 void main()
 {
-    float scale = 4;
-    float xoff = scale*((float(gl_GlobalInvocationID.x)/light_dim) - 0.5f);
-    float yoff = scale*((float(gl_GlobalInvocationID.y)/light_dim) - 0.5f);
 
-    //start with a vector pointing down the z axis (greater than half the corner to corner distance, i.e. > ~1.75)
-    vec3 org = vec3(xoff, yoff,  2); //add the offsets in x and y
+	// dir calculation is the same as the old directional lighting shader, which is in turn the same as the display shader
     vec3 dir = vec3(   0,    0, -2); //simply a vector pointing in the opposite direction, no xy offsets
 
-    //rotate both vectors 'up' by phi, e.g. about the x axis
+    // rotate dir vector 'up' by phi, e.g. about the x axis
     mat3 rotphi = rotationMatrix(vec3(1,0,0), uphi);
-    org *= rotphi;
     dir *= rotphi;
 
-    //rotate both about the y axis by theta
+    // rotate about the y axis by theta
     mat3 rottheta = rotationMatrix(vec3(0,1,0), utheta);
-    org *= rottheta;
     dir *= rottheta;
 
-   //does a ray with that origin and that direction hit the cube?
-    if(hit(org,dir))
-    { 
-        //trace the ray through the volume
-        traceray(org,dir);
-        //imageStore(lighting, ivec3(255*(org+tmax*dir+vec3(1))), vec4(light_intensity));
-    }
+	 // this is all the information traceray needs, the direction from which the light is coming
+	 traceray(dir);
 }
 
