@@ -1052,6 +1052,8 @@ void GLContainer::lighting_clear(bool use_cache_level, float intensity)
         // directional
 void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
 {
+    // auto t1 = std::chrono::high_resolution_clock::now();
+    
     redraw_flag = true;
     glUseProgram(directional_lighting_compute);
 
@@ -1067,10 +1069,16 @@ void GLContainer::compute_directional_lighting(float theta, float phi, float ini
     glDispatchCompute( LIGHT_DIM/8, LIGHT_DIM/8, 1 ); //workgroup is 8x8x1, so divide x and y by 8
 
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+
+    // cout << "old lighting took " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
 }
 
 void GLContainer::compute_new_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
 {
+    // auto t1 = std::chrono::high_resolution_clock::now();
+    
     redraw_flag = true;
     glUseProgram(new_directional_lighting_compute);
 
@@ -1086,6 +1094,10 @@ void GLContainer::compute_new_directional_lighting(float theta, float phi, float
     glDispatchCompute( DIM/8, DIM/8, DIM/8 ); //workgroup is 8x8x8
 
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+
+    // auto t2 = std::chrono::high_resolution_clock::now();
+
+    // cout << "new lighting took " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
 }
 
         // ambient occlusion

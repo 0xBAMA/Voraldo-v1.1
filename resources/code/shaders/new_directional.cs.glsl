@@ -34,9 +34,9 @@ mat3 rotationMatrix(vec3 axis, float angle)
 
 double tmin, tmax; //global scope, set in hit() to tell min and max parameters
 
-#define NUM_STEPS 500
-#define MIN_DISTANCE 0.0
-#define MAX_DISTANCE 10.0
+#define NUM_STEPS 5000
+#define MIN_DISTANCE -10000.0
+#define MAX_DISTANCE 10000.0
 
 bool hit(vec3 org, vec3 dir)
 {
@@ -92,20 +92,61 @@ void traceray(vec3 dir)
 {
 	// the location you need to consider is specified by gl_GlobalInvocationID
 
-	
+    vec3 org = (vec3(2*gl_GlobalInvocationID.xyz) - vec3(imageSize(lighting).x)) / imageSize(lighting).x;
+
+    hit(org, dir); // we now have tmin and tmax set - tmin will be negative and will tell where the first intersection with the block is
+
+    float current_t = float(tmin);
+    float current_intensity = light_intensity; // the strength of the light, before traversing any of the volume
+
+    float prev_intensity = imageLoad(lighting, ivec3(gl_GlobalInvocationID.xyz)).r; // the lighting value that was in the cell, before this operation
+
+    ivec3 sample_location;
+    float alpha_sample;
 
 
-    vec3 org = (vec3(imageSize(lighting))/2.0f) *
+
+    // float step = float((tmax-tmin))/NUM_STEPS;
+    float step = 0.003; // uniform step seems to fit better here
+
+
+    for(int i = 0; i < NUM_STEPS; i++)
+    {
+        if(current_t < 0 && current_intensity > 0)
+        {
+            // new sample location
+            sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1)));
+
+            if(sample_location == ivec3(gl_GlobalInvocationID.xyz))
+                break;
+
+            // new read for the alpha_sample
+            alpha_sample = imageLoad(current, sample_location).a;
+
+            // decrement intensity with the value of alpha_sample
+            current_intensity *= 1-pow(alpha_sample, decay_power);
+
+            // increment t with the step
+            current_t += step;
+
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // add the current_intensity to the previous intensity
+    current_intensity += prev_intensity;
+    imageStore(lighting, ivec3(gl_GlobalInvocationID.xyz), vec4(current_intensity));
 
 
 
-  // float current_t = float(tmin);
-  // float intensity = light_intensity; //initialize ray intensity
+    // imageStore(lighting, sample_location, vec4(alpha_sample));
 
-  // float step = float((tmax-tmin))/NUM_STEPS;
-  // if(step < 0.001f) step = 0.001f;
 
-  // ivec3 sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1)));
+
+
 
   // vec4 new_color_read = imageLoad(current, sample_location);
   // vec4 new_light_read = imageLoad(lighting, sample_location);
