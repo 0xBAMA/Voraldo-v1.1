@@ -161,6 +161,7 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;        cout << "light_clear shader done." << endl;
     directional_lighting_compute = CShader("resources/code/shaders/directional.cs.glsl").Program;        cout << "directional light shader done." << endl;
     new_directional_lighting_compute = CShader("resources/code/shaders/new_directional.cs.glsl").Program;        cout << "new directional light shader done." << endl;
+    point_lighting_compute       = CShader("resources/code/shaders/point_light.cs.glsl").Program;        cout << "point light shader done." << endl;
     ambient_occlusion_compute    = CShader("resources/code/shaders/ambient_occlusion.cs.glsl").Program;  cout << "ambient occlusion shader done." << endl;
     fakeGI_compute               = CShader("resources/code/shaders/fakeGI.cs.glsl").Program;             cout << "fake global illumination shader done." << endl;
     mash_compute                 = CShader("resources/code/shaders/mash.cs.glsl").Program;               cout << "lighting mash shader done." << endl;
@@ -1084,7 +1085,6 @@ void GLContainer::compute_new_directional_lighting(float theta, float phi, float
 
     glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "utheta"), theta);
     glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "uphi"), phi);
-    glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "light_dim"), LIGHT_DIM);
     glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "light_intensity"), initial_ray_intensity);
     glUniform1f(glGetUniformLocation(new_directional_lighting_compute, "decay_power"), decay_power);
 
@@ -1099,6 +1099,28 @@ void GLContainer::compute_new_directional_lighting(float theta, float phi, float
 
     // cout << "new lighting took " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
 }
+
+
+        // point light
+void GLContainer::compute_point_lighting(glm::vec3 location, float initial_intensity, float decay_power, float distance_power)
+{
+    redraw_flag = true;
+    glUseProgram(point_lighting_compute);
+
+    glUniform3fv(glGetUniformLocation(point_lighting_compute, "light_position"), 1, glm::value_ptr(location));
+
+    glUniform1f(glGetUniformLocation(point_lighting_compute, "light_intensity"), initial_intensity);
+    glUniform1f(glGetUniformLocation(point_lighting_compute, "decay_power"), decay_power);
+    glUniform1f(glGetUniformLocation(point_lighting_compute, "distance_power"), distance_power);
+
+    glUniform1i(glGetUniformLocation(point_lighting_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(point_lighting_compute, "lighting"), 6);
+    
+    glDispatchCompute(DIM/8, DIM/8, DIM/8);
+
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT ); 
+}
+
 
         // ambient occlusion
 void GLContainer::compute_ambient_occlusion(int radius)

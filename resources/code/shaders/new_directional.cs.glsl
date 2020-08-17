@@ -140,35 +140,6 @@ void traceray(vec3 dir)
     current_intensity += prev_intensity;
     imageStore(lighting, ivec3(gl_GlobalInvocationID.xyz), vec4(current_intensity));
 
-
-
-    // imageStore(lighting, sample_location, vec4(alpha_sample));
-
-
-
-
-
-  // vec4 new_color_read = imageLoad(current, sample_location);
-  // vec4 new_light_read = imageLoad(lighting, sample_location);
-
-  // //three termination conditions - number of steps, distance along the ray, intensity < 0
-  // for(int i = 0; i < NUM_STEPS; i++)
-  // {
-  //   if(current_t <= tmax && intensity > 0)
-  //   {
-  //       imageStore(lighting, sample_location, vec4(new_light_read.r+intensity));
-
-  //       //intensity -= new_color_read.a;
-  //       //intensity *= 1-pow(new_color_read.a, 2);
-  //       intensity *= 1-pow(new_color_read.a, decay_power);
-
-  //       current_t += step;
-  //       sample_location = ivec3((vec3(imageSize(lighting))/2.0f)*(org+current_t*dir+vec3(1)));
-
-  //       new_color_read = imageLoad(current, sample_location);
-  //       new_light_read = imageLoad(lighting, sample_location);
-  //   }
-  // }
 }
 
 
@@ -176,7 +147,7 @@ void main()
 {
 
 	// dir calculation is the same as the old directional lighting shader, which is in turn the same as the display shader
-    vec3 dir = vec3(   0,    0, -2); //simply a vector pointing in the opposite direction, no xy offsets
+    vec3 dir = vec3(   0,    0, -1); //simply a vector pointing in the opposite direction, no xy offsets
 
     // rotate dir vector 'up' by phi, e.g. about the x axis
     mat3 rotphi = rotationMatrix(vec3(1,0,0), uphi);

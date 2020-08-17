@@ -1057,7 +1057,7 @@ void Voraldo::ControlWindow(bool *open)
                     // https://bitbucket.org/BWerness/voxel-automata-terrain/src/master/
 
                     static ImVec4 color0 = ImVec4(0,0,0,0);
-                    static ImVec4 color1 = ImVec4(210.0/255.0, 180.0/255.0, 140.0/255.0, 45.0/255.0);  // Wikipedia Tan
+                    static ImVec4 color1 = ImVec4(210.0/255.0, 180.0/255.0, 140.0/255.0, 105.0/255.0); // Wikipedia Tan
                     static ImVec4 color2 = ImVec4(143.0/255.0, 151.0/255.0, 121.0/255.0, 95.0/255.0); // Wikipedia Artichoke Green
 
                     static float lambda = 0.35;
@@ -1506,6 +1506,13 @@ void Voraldo::ControlWindow(bool *open)
                     static float GI_sky_intensity = 0.16;
 
 
+                    static glm::vec3 point_light_position = glm::vec3(0,0,0);
+                    static float point_intensity = 0;
+                    static float point_decay_power = 0;
+                    static float point_distance_power = 0;
+
+
+                    
                     ImGui::Text("This is the lighting system of Voraldo -");
                     ImGui::Text("it is held as another buffer which scales");
                     ImGui::Text("the color values held in the regular");
@@ -1524,6 +1531,21 @@ void Voraldo::ControlWindow(bool *open)
                     if (ImGui::Button("Clear", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
                         GPU_Data.lighting_clear(use_cache, clear_level);
 
+                    ImGui::Separator();
+
+                    ImGui::Text("Point Light");
+                    ImGui::SliderFloat("loc x", &point_light_position.x, -100, DIM+100, "%.3f");
+                    ImGui::SliderFloat("loc y", &point_light_position.y, -100, DIM+100, "%.3f");
+                    ImGui::SliderFloat("loc z", &point_light_position.z, -100, DIM+100, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::SliderFloat("value#", &point_intensity, 0, 1.0, "%.3f");
+                    ImGui::SliderFloat("decay#", &point_decay_power, 0, 3.0, "%.3f");
+                    ImGui::SliderFloat("dist power", &point_distance_power, 0, 3.0f, "%.3f");
+                    
+                    if (ImGui::Button("Point Light", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
+                        GPU_Data.compute_point_lighting(point_light_position, point_intensity, point_decay_power, point_distance_power);
+
+                    
                     ImGui::Separator();
 
                     ImGui::Text("Directional");
