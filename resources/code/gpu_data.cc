@@ -272,7 +272,7 @@ void GLContainer::buffer_geometry()
     glm::vec3 gy = g + offset; gy.x *= factor; gy.y *= length; gy.z *= factor;
     glm::vec3 hy = h + offset; hy.x *= factor; hy.y *= length; hy.z *= factor;
 
-    offset = glm::vec3(0, 0, POS);
+    offset = glm::vec3(0, 0, NEG); // not sure why this needs to be inverted, but it does
     glm::vec3 az = a + offset; az.x *= factor; az.y *= factor; az.z *= length;
     glm::vec3 bz = b + offset; bz.x *= factor; bz.y *= factor; bz.z *= length;
     glm::vec3 cz = c + offset; cz.x *= factor; cz.y *= factor; cz.z *= length;

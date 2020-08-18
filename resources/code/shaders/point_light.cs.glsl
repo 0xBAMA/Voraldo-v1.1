@@ -87,7 +87,7 @@ void traceray(vec3 dir)
     vec3 org = (vec3(2*gl_GlobalInvocationID.xyz) - vec3(imageSize(lighting).x)) / imageSize(lighting).x;
     vec3 lpos = (vec3(2*light_position) - vec3(imageSize(lighting).x)) / imageSize(lighting).x;
 
-    hit(lpos, dir); // we now have tmin and tmax set
+    hit(org, dir); // we now have tmin and tmax set
 
 
   // note that we need to consider which is smaller:
@@ -105,7 +105,10 @@ void traceray(vec3 dir)
     float prev_intensity = imageLoad(lighting, ivec3(gl_GlobalInvocationID.xyz)).r; // the lighting value that was in the cell, before this operation
     float current_intensity = light_intensity; // the strength of the light, before traversing any of the volume
 
+    // float step = float((tmax-tmin))/NUM_STEPS;
+    float step = 0.003; // uniform step seems to fit better here
 
+   
     // note also that in the shader invocation that shares a location with the point light, there is a case that needs to be handled -
     //   that shader invocation will simply take the light intensity as specified by the uniform input, skipping any traversal of the space
     if(vec3(gl_GlobalInvocationID.xyz) != light_position)
@@ -116,9 +119,6 @@ void traceray(vec3 dir)
 
             ivec3 sample_location;
             float alpha_sample;
-
-            // float step = float((tmax-tmin))/NUM_STEPS;
-            float step = 0.003; // uniform step seems to fit better here
 
             for(int i = 0; i < NUM_STEPS; i++)
             {
@@ -152,9 +152,6 @@ void traceray(vec3 dir)
 
             ivec3 sample_location;
             float alpha_sample;
-
-            // float step = float((tmax-tmin))/NUM_STEPS;
-            float step = 0.003; // uniform step seems to fit better here
 
             for(int i = 0; i < NUM_STEPS; i++)
             {
