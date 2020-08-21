@@ -13,14 +13,18 @@ void main()
     vec4 prev = imageLoad(lighting, ivec3(gl_GlobalInvocationID.xyz));    //existing color value (what is the color?)
 
     float alpha_sum = 0.0f;
-    int num_cells = 0;
+    float total_weight = 0.0;
+    float current_weight = 0.0;
+
+    float max_dist = distance(vec3(0), vec3(radius)); // largest distance between the center cell and the other cells
 
     for(int x = -radius; x <= radius; x++)
         for(int y = -radius; y <= radius; y++)
             for(int z = -radius; z <= radius; z++)
             {
-                num_cells++;
-                alpha_sum += imageLoad(current, ivec3(gl_GlobalInvocationID.xyz)+ivec3(x,y,z)).a;
+                current_weight = 1-(distance(vec3(0), vec3(x, y, z)));
+                total_weight+=current_weight;
+                alpha_sum += imageLoad(current, ivec3(gl_GlobalInvocationID.xyz)+ivec3(x,y,z)).a*current_weight;
             }
 
     //sum up alpha values across the cells being considered
@@ -30,7 +34,7 @@ void main()
     //a high ratio of occuppancy means this cell should be darkened
     //therefore, we are multiplying the existing lighting value by one minus this ratio
 
-    float new = prev.r * (1 - alpha_sum/num_cells); 
+    float new = prev.r * (1 - alpha_sum/total_weight);
 
     imageStore(lighting, ivec3(gl_GlobalInvocationID.xyz), vec4(new));
 }
