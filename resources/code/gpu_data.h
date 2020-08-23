@@ -96,6 +96,9 @@ class GLContainer
 
         // point lighting
         void compute_point_lighting(glm::vec3 location, float initial_intensity, float decay_power, float distance_power);
+
+        // cone lighting
+        void compute_cone_lighting(glm::vec3 location, float theta, float phi, float cone_angle, float initial_intensity, float decay_power, float distance_power);
         
         // ambient occlusion
         void compute_ambient_occlusion(int radius);
@@ -224,6 +227,7 @@ class GLContainer
         GLuint new_directional_lighting_compute;
         GLuint directional_lighting_compute;
         GLuint point_lighting_compute;
+        GLuint cone_lighting_compute;
         GLuint ambient_occlusion_compute;
         GLuint fakeGI_compute;
         GLuint mash_compute;

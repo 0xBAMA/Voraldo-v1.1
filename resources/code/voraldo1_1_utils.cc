@@ -1487,41 +1487,37 @@ void Voraldo::ControlWindow(bool *open)
             {
                 ImGui::BeginTabBar("l", tab_bar_flags);
 
-                if(ImGui::BeginTabItem(" Clear Lighting "))
-                {
+                static float clear_level;
+                static bool use_cache;
 
-                    // need to break this up
-                    static float clear_level;
-                    static bool use_cache;
+                static float directional_theta;
+                static float directional_phi;
+                static float directional_intensity;
+                static float decay_power;
 
-                    static float directional_theta;
-                    static float directional_phi;
-                    static float directional_intensity;
-                    static float decay_power;
+                static int AO_radius;
 
-                    static int AO_radius;
-
-                    static float GI_scale_factor = 0.028;
-                    static float GI_alpha_thresh = 0.010;
-                    static float GI_sky_intensity = 0.16;
+                static float GI_scale_factor = 0.028;
+                static float GI_alpha_thresh = 0.010;
+                static float GI_sky_intensity = 0.16;
 
 
-                    static glm::vec3 point_light_position = glm::vec3(0,0,0);
-                    static float point_intensity = 0;
-                    static float point_decay_power = 0;
-                    static float point_distance_power = 0;
+                static glm::vec3 point_light_position = glm::vec3(0,0,0);
+                static float point_intensity = 0;
+                static float point_decay_power = 0;
+                static float point_distance_power = 0;
 
 
+                static glm::vec3 cone_light_position = glm::vec3(0,0,0);
+                static float cone_theta = 0;
+                static float cone_phi = 0;
+                static float cone_angle = 0;
+                static float cone_intensity = 0;
+                static float cone_decay_power = 0;
+                static float cone_distance_power = 0;
                     
-                    ImGui::Text("This is the lighting system of Voraldo -");
-                    ImGui::Text("it is held as another buffer which scales");
-                    ImGui::Text("the color values held in the regular");
-                    ImGui::Text("block.");
-                    ImGui::Text(" ");
-                    ImGui::Text("Directional lighting is applied in a");
-                    ImGui::Text("manner sort of similar to the shadow map");
-                    ImGui::Text("approach that is used elsewhere.");
-                    ImGui::Text(" ");
+                if(ImGui::BeginTabItem(" Clear "))
+                {
 
                     ImGui::Text("Clear Level - 0.25 is neutral");
                     ImGui::SliderFloat("level", &clear_level, 0.0f, 1.0f, "%.3f");
@@ -1532,14 +1528,19 @@ void Voraldo::ControlWindow(bool *open)
                         GPU_Data.lighting_clear(use_cache, clear_level);
 
                     ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
+
+                if(ImGui::BeginTabItem(" Point "))
+                {
 
                     ImGui::Text("Point Light");
                     ImGui::SliderFloat("loc x", &point_light_position.x, -100, DIM+100, "%.3f");
                     ImGui::SliderFloat("loc y", &point_light_position.y, -100, DIM+100, "%.3f");
                     ImGui::SliderFloat("loc z", &point_light_position.z, -100, DIM+100, "%.3f");
                     ImGui::Text(" ");
-                    ImGui::SliderFloat("value#", &point_intensity, 0, 1.0, "%.3f");
-                    ImGui::SliderFloat("decay#", &point_decay_power, 0, 3.0, "%.3f");
+                    ImGui::SliderFloat("value", &point_intensity, 0, 1.0, "%.3f");
+                    ImGui::SliderFloat("decay", &point_decay_power, 0, 3.0, "%.3f");
                     ImGui::SliderFloat("dist power", &point_distance_power, 0, 3.0f, "%.3f");
                     
                     if (ImGui::Button("Point Light", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
@@ -1547,6 +1548,18 @@ void Voraldo::ControlWindow(bool *open)
 
                     
                     ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
+
+                if(ImGui::BeginTabItem(" Cone "))
+                {
+
+                    ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
+                                
+                if(ImGui::BeginTabItem(" Directional "))
+                {
 
                     ImGui::Text("Directional");
                     ImGui::SliderFloat("theta", &directional_theta, -3.14f, 3.14f, "%.3f");
@@ -1558,31 +1571,13 @@ void Voraldo::ControlWindow(bool *open)
                     if (ImGui::Button("New Directional", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
                         GPU_Data.compute_new_directional_lighting(directional_theta, directional_phi, directional_intensity, decay_power);
 
-                    ImGui::SameLine();
-                    
-                    if (ImGui::Button("Apply Directional", ImVec2(120, 22))) // Buttons return true when clicked (most widgets return true when edited/activated)
-                        GPU_Data.compute_directional_lighting(directional_theta, directional_phi, directional_intensity, decay_power);
-
-                    //if (ImGui::Button("Per Frame", ImVec2(120, 22)))
-                    //current_menu_state = PER_FRAME_LIGHTING_CONFIG;
-
                     ImGui::Separator();
-
-                    ImGui::Text("Ambient occlusion is based on a weighted");
-                    ImGui::Text("average of the alpha values in the");
-                    ImGui::Text("specified size neighborhood.");
-                    ImGui::Text(" ");
-                    ImGui::SliderInt("radius", &AO_radius, 0, 5);
-
-                    if (ImGui::Button("Apply AO", ImVec2(120, 22)))
-                    {
-                        GPU_Data.compute_ambient_occlusion(AO_radius);
-                    }
-
-
-                    ImGui::Separator();
-
-                    ImGui::Text("Fake GI is computed by tracing rays");
+                    ImGui::EndTabItem();
+                }
+  
+                if(ImGui::BeginTabItem(" Fake GI "))
+                {
+                   ImGui::Text("Fake GI is computed by tracing rays");
                     ImGui::Text("upwards from each cell. If they ");
                     ImGui::Text("escape the volume, they get the");
                     ImGui::Text("sky_intensity added. Otherwise they");
@@ -1599,6 +1594,30 @@ void Voraldo::ControlWindow(bool *open)
                     }
 
                     ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
+
+                if(ImGui::BeginTabItem(" Ambient Occlusion "))
+                {
+                    ImGui::Text("Ambient occlusion is based on a weighted");
+                    ImGui::Text("average of the alpha values in the");
+                    ImGui::Text("specified size neighborhood.");
+                    ImGui::Text(" ");
+                    ImGui::SliderInt("radius", &AO_radius, 0, 5);
+
+                    if (ImGui::Button("Apply AO", ImVec2(120, 22)))
+                    {
+                        GPU_Data.compute_ambient_occlusion(AO_radius);
+                    }
+
+
+                    ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
+
+
+                if(ImGui::BeginTabItem(" Mash "))
+                {
                     ImGui::Text("Mash combines the lighting buffer");
                     ImGui::Text("and the color buffer, so that the");
                     ImGui::Text("block can be saved with the ");
@@ -1610,31 +1629,6 @@ void Voraldo::ControlWindow(bool *open)
                     }
 
                     ImGui::Separator();
-
-                    ImGui::EndTabItem();
-                }
-
-                if(ImGui::BeginTabItem(" Fake GI "))
-                {
-
-                    ImGui::EndTabItem();
-                }
-
-                if(ImGui::BeginTabItem(" Ambient Occlusion "))
-                {
-
-                    ImGui::EndTabItem();
-                }
-
-                if(ImGui::BeginTabItem(" Directional "))
-                {
-
-                    ImGui::EndTabItem();
-                }
-
-                if(ImGui::BeginTabItem(" Mash "))
-                {
-
                     ImGui::EndTabItem();
                 }
 
