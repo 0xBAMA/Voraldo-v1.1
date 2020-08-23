@@ -159,7 +159,6 @@ void GLContainer::compile_shaders() // going to make this more compact this time
 
     // Lighting
     lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;        cout << "light_clear shader done." << endl;
-    directional_lighting_compute = CShader("resources/code/shaders/directional.cs.glsl").Program;        cout << "directional light shader done." << endl;
     new_directional_lighting_compute = CShader("resources/code/shaders/new_directional.cs.glsl").Program;        cout << "new directional light shader done." << endl;
     point_lighting_compute       = CShader("resources/code/shaders/point_light.cs.glsl").Program;        cout << "point light shader done." << endl;
     cone_lighting_compute        = CShader("resources/code/shaders/cone_light.cs.glsl").Program;         cout << "cone light shader done." << endl;
@@ -1051,31 +1050,6 @@ void GLContainer::lighting_clear(bool use_cache_level, float intensity)
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
-        // directional
-void GLContainer::compute_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
-{
-    // auto t1 = std::chrono::high_resolution_clock::now();
-    
-    redraw_flag = true;
-    glUseProgram(directional_lighting_compute);
-
-    glUniform1f(glGetUniformLocation(directional_lighting_compute, "utheta"), theta);
-    glUniform1f(glGetUniformLocation(directional_lighting_compute, "uphi"), phi);
-    glUniform1f(glGetUniformLocation(directional_lighting_compute, "light_dim"), LIGHT_DIM);
-    glUniform1f(glGetUniformLocation(directional_lighting_compute, "light_intensity"), initial_ray_intensity);
-    glUniform1f(glGetUniformLocation(directional_lighting_compute, "decay_power"), decay_power);
-
-    glUniform1i(glGetUniformLocation(directional_lighting_compute, "current"), 2+tex_offset);
-    glUniform1i(glGetUniformLocation(directional_lighting_compute, "lighting"), 6);
-
-    glDispatchCompute( LIGHT_DIM/8, LIGHT_DIM/8, 1 ); //workgroup is 8x8x1, so divide x and y by 8
-
-    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
-
-    // auto t2 = std::chrono::high_resolution_clock::now();
-
-    // cout << "old lighting took " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
-}
 
 void GLContainer::compute_new_directional_lighting(float theta, float phi, float initial_ray_intensity, float decay_power)
 {
