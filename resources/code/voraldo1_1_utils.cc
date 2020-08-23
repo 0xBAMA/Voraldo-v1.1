@@ -265,7 +265,7 @@ void Voraldo::gl_setup()
 // basically just a tooltip, useful for including a note that won't shit up a significant chunk of the window
 void Voraldo::HelpMarker(const char* indicator, const char* desc)
 {
-    ImGui::TextDisabled(indicator);
+    ImGui::TextDisabled("%s", indicator);
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
@@ -500,7 +500,8 @@ void Voraldo::ControlWindow(bool *open)
         ImGui::Begin("Controls", open, flags);
 
         ImVec2 windowsize = ImGui::GetWindowSize();
-
+        (void)windowsize;
+        
         // tabbed layout
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
 
@@ -1553,6 +1554,24 @@ void Voraldo::ControlWindow(bool *open)
 
                 if(ImGui::BeginTabItem(" Cone "))
                 {
+                    ImGui::Text("Point Light");
+                    ImGui::SliderFloat("loc x", &cone_light_position.x, -100, DIM+100, "%.3f");
+                    ImGui::SliderFloat("loc y", &cone_light_position.y, -100, DIM+100, "%.3f");
+                    ImGui::SliderFloat("loc z", &cone_light_position.z, -100, DIM+100, "%.3f");
+                    ImGui::Text(" ");
+
+                    ImGui::SliderFloat("theta", &cone_theta, -3.14f, 3.14f, "%.3f");
+                    ImGui::SliderFloat("phi", &cone_phi, -3.14f, 3.14f, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::Text("Defines the width of the cone");
+                    ImGui::SliderFloat("cone angle", &cone_angle, -3.14f, 3.14f, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::Text("Defines the initial intensity of this light source");
+                    ImGui::SliderFloat("value", &cone_intensity, 0, 1.0, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::Text("Defines the falloff - decay is interaction with alpha");
+                    ImGui::SliderFloat("decay", &cone_decay_power, 0, 3.0, "%.3f");
+                    ImGui::SliderFloat("dist power", &cone_distance_power, 0, 3.0f, "%.3f");
 
                     ImGui::Separator();
                     ImGui::EndTabItem();
