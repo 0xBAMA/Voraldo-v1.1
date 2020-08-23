@@ -35,6 +35,7 @@ class Voraldo
 		void FPSOverlay(bool* p_open);
 		void HelpMarker(const char* indicator, const char* desc);
 		void QuitConfirm(bool *open);
+		void WrappedText(const char* string, float wrap);
 		
 		void create_window();
 		void gl_setup();

@@ -276,6 +276,14 @@ void Voraldo::HelpMarker(const char* indicator, const char* desc)
     }
 }
 
+void Voraldo::WrappedText(const char* string, float wrap)
+{
+    // ImGui::PushTextWrapPos(ImGui::GetFontSize() * wrap);
+    ImGui::PushTextWrapPos(wrap);
+    ImGui::TextUnformatted(string);
+    ImGui::PopTextWrapPos();
+}
+
 
 // small overlay to show the FPS counter, FPS graph
 void Voraldo::FPSOverlay(bool* p_open)
@@ -500,7 +508,7 @@ void Voraldo::ControlWindow(bool *open)
         ImGui::Begin("Controls", open, flags);
 
         ImVec2 windowsize = ImGui::GetWindowSize();
-        (void)windowsize;
+        (void)windowsize; // this is just to remove the compiler warning 
         
         // tabbed layout
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None | ImGuiTabBarFlags_FittingPolicyScroll;
@@ -650,12 +658,8 @@ void Voraldo::ControlWindow(bool *open)
                     static ImVec4 cylinder_draw_color;
                     static float cylinder_radius;
 
-                    // ImGui::Text("Cylinder is defined by two points.");
-                    // ImGui::Text("tvec is in the center of the top");
-                    // ImGui::Text("and bvec is in the center of the");
-                    // ImGui::Text("bottom. Thickness determines the");
-                    // ImGui::Text("radius of the cylinder. ");
-                    // ImGui::Text(" ");
+                    WrappedText("Cylinder is defined by two points. tvec is in the center of the top and bvec is in the center of the bottom. Thickness determines the radius of the cylinder. ", windowsize.x);
+                    ImGui::Text(" ");
 
                     ImGui::SliderFloat(" radius", &cylinder_radius, 0.0f, 300.0f, "%.3f");
 
@@ -697,11 +701,8 @@ void Voraldo::ControlWindow(bool *open)
                     static bool ellipsoid_draw = true, ellipsoid_mask = false;
                     static ImVec4 ellipsoid_draw_color;
 
-                    // ImGui::Text("Ellipsoid is similar to the sphere");
-                    // ImGui::Text("but has three different radii. In");
-                    // ImGui::Text("addition to this it can be rotated");
-                    // ImGui::Text("to give the desired orientation. ");
-                    // ImGui::Text(" ");
+                    WrappedText("Ellipsoid is similar to the sphere but has three different radii. In addition to this it can be rotated to give the desired orientation. ", windowsize.x);
+                    ImGui::Text(" ");
 
                     ImGui::SliderFloat("x location", &center.x, 0.0f, float(DIM), "%.3f");
                     ImGui::SliderFloat("y location", &center.y, 0.0f, float(DIM), "%.3f");
@@ -748,11 +749,7 @@ void Voraldo::ControlWindow(bool *open)
                     static bool grid_draw = true;
                     static bool grid_mask = false;
 
-                    // ImGui::Text("Use the spacing control to set the");
-                    // ImGui::Text("distance between grid lines. Width");
-                    // ImGui::Text("sets the width of these grid lines,");
-                    // ImGui::Text("and offset allows the whole grid");
-                    // ImGui::Text("to be moved. ");
+                    WrappedText("Use the spacing control to set the distance between grid lines. Width sets the width of these grid lines, and offset allows the whole grid to be moved. ", windowsize.x);
                     ImGui::Text(" ");
                     ImGui::Text("spacing");
                     ImGui::SliderInt(" xs", &xspacing, 0, 15);
@@ -859,9 +856,7 @@ void Voraldo::ControlWindow(bool *open)
                     static bool perlin_mask = false;
                     static bool perlin_smooth = false;
 
-                    ImGui::Text("Larger numbers are smaller lobes.");
-                    ImGui::Text("Click generate to send your new ");
-                    ImGui::Text("scalings to the GPU to draw with.");
+                    WrappedText("Larger numbers are smaller lobes. Click generate to send your new scalings to the GPU to draw with.", windowsize.x);
                     ImGui::Text(" ");
                     ImGui::SliderFloat("  xscale", &perlin_scale_x, 0.01f, 0.5f, "%.3f");
                     ImGui::SliderFloat("  yscale", &perlin_scale_y, 0.01f, 0.5f, "%.3f");
@@ -875,10 +870,7 @@ void Voraldo::ControlWindow(bool *open)
 
                     ImGui::Separator();
 
-                    ImGui::Text("Perlin noise ranges from 0 to 1.");
-                    ImGui::Text("Use hithresh and lowthresh to tell");
-                    ImGui::Text("how much of this perlin texture to");
-                    ImGui::Text("color in.");
+                    WrappedText("Perlin noise ranges from 0 to 1. Use hithresh and lowthresh to tell how much of this perlin texture to color in.", windowsize.x);
 
 
                     ImGui::SliderFloat(" hithresh", &perlin_threshold_hi, 0.0f, 1.0f, "%.3f");
@@ -914,9 +906,7 @@ void Voraldo::ControlWindow(bool *open)
                     static ImVec4 sphere_draw_color;
                     static glm::vec3 sphere_location;
 
-                    ImGui::Text("Use the sliders to set the radius");
-                    ImGui::Text("and the x, y, z components of the");
-                    ImGui::Text("center's position.");
+                    WrappedText("Use the sliders to set the radius and the x, y, z components of the center's position.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SliderFloat("  radius", &sphere_radius, 0.0f, 500.0f, "%.3f");
@@ -955,11 +945,8 @@ void Voraldo::ControlWindow(bool *open)
                     static ImVec4 tube_draw_color;
                     static float tube_inner_radius, tube_outer_radius;
 
-                    // ImGui::Text("Tube is a cylinder with a cylinder");
-                    // ImGui::Text("cut out from the center. Outer is");
-                    // ImGui::Text("the outer radius, and inner is the");
-                    // ImGui::Text("radius of the cutout.");
-                    // ImGui::Text(" ");
+                    WrappedText("Tube is a cylinder with a cylinder cut out from the center. Outer is the outer radius, and inner is the radius of the cutout.", windowsize.x);
+                    ImGui::Text(" ");
 
                     ImGui::Text("Radii");
 
@@ -1006,10 +993,7 @@ void Voraldo::ControlWindow(bool *open)
                     static bool triangle_draw = true;
                     static bool triangle_mask = false;
 
-                    ImGui::Text("Triangles consist of three points,");
-                    ImGui::Text("use the sliders below to set each");
-                    ImGui::Text("x, y and z value. Thickness will");
-                    ImGui::Text("set the thickness of the triangle.");
+                    WrappedText("Triangles consist of three points, use the sliders below to set each x, y and z value. Thickness will set the thickness of the triangle.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SliderFloat(" thickness", &thickness, 0.0f, 300.0f, "%.3f");
@@ -1073,10 +1057,7 @@ void Voraldo::ControlWindow(bool *open)
                     static char str0[256] = "";
 
                     //config options for this operation
-                    ImGui::Text("This is an interesting way to");
-                    ImGui::Text("generate shapes, developed by");
-                    ImGui::Text("Brent Werness - enter a rule, r");
-                    ImGui::Text("for Random or i for IsingRandom"); // may want to parameterize this further, with beta, lambda, mag - just want to get it working first
+                    WrappedText("This is an interesting way to generate shapes, developed by Brent Werness - enter a rule, r for Random or i for IsingRandom", windowsize.x); // may want to parameterize this further, with beta, lambda, mag - just want to get it working first
                     ImGui::Text(" ");
 
                     // string entry, letting the user input a rule
@@ -1146,10 +1127,7 @@ void Voraldo::ControlWindow(bool *open)
                 {
                     static bool respect_mask = false;
 
-                    ImGui::Text("This will clear the block, with an");
-                    ImGui::Text("option to respect the mask. If you ");
-                    ImGui::Text("check that, masked cells won't be ");
-                    ImGui::Text("cleared. ");
+                    WrappedText("This will clear the block, with an option to respect the mask. If you check that, masked cells won't be cleared.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::Checkbox("  Respect mask ", &respect_mask);
@@ -1168,9 +1146,7 @@ void Voraldo::ControlWindow(bool *open)
 
                 if(ImGui::BeginTabItem(" Masking "))
                 {
-                    ImGui::Text("This will clear the mask value for");
-                    ImGui::Text("all cells. Equivalently, set mask ");
-                    ImGui::Text("to false for all voxels. ");
+                    WrappedText("This will clear the mask value for all cells. Equivalently, set mask to false for all voxels. ", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SetCursorPosX(16);
@@ -1184,10 +1160,7 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text(" ");
                     ImGui::Text(" ");
 
-                    ImGui::Text("This will toggle the value of mask ");
-                    ImGui::Text("for all voxels. Masked cells will ");
-                    ImGui::Text("become unmasked, and unmasked will ");
-                    ImGui::Text("become masked. ");
+                    WrappedText("This will toggle the value of mask for all voxels. Masked cells will become unmasked, and unmasked will become masked.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SetCursorPosX(16);
@@ -1217,27 +1190,14 @@ void Voraldo::ControlWindow(bool *open)
                     static float l_variance=0.0;
 
 
-                    // ImGui::Text("Use the HSV picker or the RGB fields");
-                    // ImGui::Text("to enter a color. Once you do that, ");
-                    // ImGui::Text("use the check boxes and sliders to ");
-                    // ImGui::Text("express how you want to use each");
-                    // ImGui::Text("channel. ");
-                    // ImGui::Text(" ");
-                    // ImGui::Text("For example, if I pick 255 in the");
-                    // ImGui::Text("red channel, check the red check ");
-                    // ImGui::Text("box, and set the slider to a non ");
-                    // ImGui::Text("zero value, you will be masking ");
-                    // ImGui::Text("the parts of the image that have ");
-                    // ImGui::Text("a high value in the red channel. ");
-                    // ImGui::Text(" ");
-                    // ImGui::Text("The slider sets how broadly this ");
-                    // ImGui::Text("operation will be applied. ");
-                    // ImGui::Text(" ");
-                    // ImGui::Text("This can be applied to the RGBA ");
-                    // ImGui::Text("color channels as well as the ");
-                    // ImGui::Text("value in the lighting buffer, to ");
-                    // ImGui::Text("mask only light or dark areas. ");
-                    // ImGui::Text(" ");
+                    WrappedText("Use the HSV picker or the RGB fields to enter a color. Once you do that, use the check boxes and sliders to express how you want to use each channel. ", windowsize.x);
+                    ImGui::Text(" ");
+                    WrappedText("For example, if I pick 255 in the red channel, check the red check box, and set the slider to a non zero value, you will be masking the parts of the image that have a high value in the red channel. ", windowsize.x);
+                    ImGui::Text(" ");
+                    WrappedText("The slider sets how broadly this operation will be applied. ", windowsize.x);
+                    ImGui::Text(" ");
+                    WrappedText("This can be applied to the RGBA color channels as well as the value in the lighting buffer, to mask only light or dark areas. ", windowsize.x);
+                    ImGui::Text(" ");
 
 
                     ImGui::ColorEdit4("  Color", (float*)&select_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
@@ -1281,11 +1241,7 @@ void Voraldo::ControlWindow(bool *open)
                     static bool touch_alpha = true;
                     static bool respect_mask = false;
 
-                    ImGui::Text("This is a simple box blur. It will ");
-                    ImGui::Text("consider the size neighborhood you ");
-                    ImGui::Text("select, and average the colors to ");
-                    ImGui::Text("give smoother transitions beteen ");
-                    ImGui::Text("neighboring cells. ");
+                    WrappedText("This is a simple box blur. It will consider the size neighborhood you select, and average the colors to give smoother transitions beteen neighboring cells.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SliderInt(" Radius", &blur_radius, 0, 5);
@@ -1313,11 +1269,7 @@ void Voraldo::ControlWindow(bool *open)
                     static bool touch_alpha = true;
                     static bool respect_mask = false;
 
-                    ImGui::Text("This is a gaussian blur. It will ");
-                    ImGui::Text("consider the size neighborhood you ");
-                    ImGui::Text("select, and average the colors to ");
-                    ImGui::Text("give smoother transitions beteen ");
-                    ImGui::Text("neighboring cells. ");
+                    WrappedText("This is a gaussian blur. It will consider the size neighborhood you select, and average the colors to give smoother transitions beteen neighboring cells.", windowsize.x);
                     ImGui::Text(" ");
 
                     ImGui::SliderInt(" Radius", &blur_radius, 0, 5);
@@ -1358,14 +1310,9 @@ void Voraldo::ControlWindow(bool *open)
                     static bool loop;
                     static int shift_mode = 1;
 
-                    ImGui::Text("This allows you to shift the voxel");
-                    ImGui::Text("data, by some amount along the x, ");
-                    ImGui::Text("y and z axes. Modes are described ");
-                    ImGui::Text("below. ");
+                    WrappedText("This allows you to shift the voxel data, by some amount along the x, y and z axes. Modes are described below. ", windowsize.x);
                     ImGui::Text(" ");
-                    ImGui::Text("If you turn on looping, data that ");
-                    ImGui::Text("goes off one side will appear on ");
-                    ImGui::Text("the opposite edge, torus-style.");
+                    WrappedText("If you turn on looping, data that goes off one side will appear on the opposite edge, torus-style.", windowsize.x);
 
 
                     ImGui::Text(" ");
@@ -1433,9 +1380,7 @@ void Voraldo::ControlWindow(bool *open)
 
                     static bool respect_mask_on_load = false;
 
-                    ImGui::Text("This function lets you load or");
-                    ImGui::Text("save of blocks using the PNG ");
-                    ImGui::Text("image format. ");
+                    WrappedText("This function lets you load or save of blocks using the PNG image format. ", windowsize.x);
                     ImGui::Text(" ");
 
 
@@ -1596,12 +1541,7 @@ void Voraldo::ControlWindow(bool *open)
   
                 if(ImGui::BeginTabItem(" Fake GI "))
                 {
-                   ImGui::Text("Fake GI is computed by tracing rays");
-                    ImGui::Text("upwards from each cell. If they ");
-                    ImGui::Text("escape the volume, they get the");
-                    ImGui::Text("sky_intensity added. Otherwise they");
-                    ImGui::Text("take a portion of the light of the");
-                    ImGui::Text("cell they hit, set by sfactor.");
+                    WrappedText("Fake GI is computed by tracing rays upwards from each cell. If they escape the volume, they get the sky_intensity added. Otherwise they take a portion of the light of the cell they hit, set by sfactor.", windowsize.x);
 
                     ImGui::SliderFloat("sfactor", &GI_scale_factor, 0.0f, 1.0f);
                     ImGui::SliderFloat("alpha threshold", &GI_alpha_thresh, 0.0f, 1.0f);
@@ -1618,9 +1558,7 @@ void Voraldo::ControlWindow(bool *open)
 
                 if(ImGui::BeginTabItem(" Ambient Occlusion "))
                 {
-                    ImGui::Text("Ambient occlusion is based on a weighted");
-                    ImGui::Text("average of the alpha values in the");
-                    ImGui::Text("specified size neighborhood.");
+                    WrappedText("Ambient occlusion is based on a weighted average of the alpha values in the specified size neighborhood.", windowsize.x);
                     ImGui::Text(" ");
                     ImGui::SliderInt("radius", &AO_radius, 0, 5);
 
@@ -1637,10 +1575,7 @@ void Voraldo::ControlWindow(bool *open)
 
                 if(ImGui::BeginTabItem(" Mash "))
                 {
-                    ImGui::Text("Mash combines the lighting buffer");
-                    ImGui::Text("and the color buffer, so that the");
-                    ImGui::Text("block can be saved with the ");
-                    ImGui::Text("lighting applied.");
+                    WrappedText("Mash combines the lighting buffer and the color buffer, so that the block can be saved with the lighting applied.", windowsize.x);
 
                     if (ImGui::Button("Mash", ImVec2(120, 22)))
                     {
