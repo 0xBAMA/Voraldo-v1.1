@@ -1499,12 +1499,12 @@ void Voraldo::ControlWindow(bool *open)
 
                 if(ImGui::BeginTabItem(" Cone "))
                 {
-                    ImGui::Text("Point Light");
+                    ImGui::Text("Location of the tip of the cone");
                     ImGui::SliderFloat("loc x", &cone_light_position.x, -100, DIM+100, "%.3f");
                     ImGui::SliderFloat("loc y", &cone_light_position.y, -100, DIM+100, "%.3f");
                     ImGui::SliderFloat("loc z", &cone_light_position.z, -100, DIM+100, "%.3f");
                     ImGui::Text(" ");
-
+                    ImGui::Text("Rotation of the cone");
                     ImGui::SliderFloat("theta", &cone_theta, -3.14f, 3.14f, "%.3f");
                     ImGui::SliderFloat("phi", &cone_phi, -3.14f, 3.14f, "%.3f");
                     ImGui::Text(" ");
@@ -1612,8 +1612,8 @@ void Voraldo::ControlWindow(bool *open)
             ImGui::Text(" ");
             ImGui::Text(" ");
 
-            // adjust power on alpha correction - make sure to set GPU_Data.redraw_flag if it changes
-            ImGui::Text("This is the correction factor for the alpha channel.");
+            // adjust power on alpha correction - make sure to set GPU_Data.redraw_flag if it changes (handled internal to GPU_Data)
+            WrappedText("This is the correction factor for the alpha channel. A value of 1.0 uses the unmanipulated value of the alpha channel - I find 2.0 is a good amount for most situations, and it makes much better use of the range than 1.0", windowsize.x);
 
             ImGui::SliderFloat("alpha correction power", &GPU_Data.alpha_correction_power, 0.5, 4.0);
 

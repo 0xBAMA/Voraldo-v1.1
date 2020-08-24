@@ -119,10 +119,10 @@ void GLContainer::display_orientation_widget()
 // ------------------------
 // ------------------------
 // initialization functions
-void GLContainer::compile_shaders() // going to make this more compact this time around
+void GLContainer::compile_shaders()
 {
-  // reporting status is not super important, just compile them - may add some code to the
-  // shader class (and cshader class) to report the filename upon unsuccessful compilation
+  // reporting status is not super important, just compile them - may want to add some code to
+  // the shader class (and cshader class) to report the filename upon unsuccessful compilation
 
     // ------------------------
     // compiling display shaders
@@ -130,41 +130,41 @@ void GLContainer::compile_shaders() // going to make this more compact this time
     display_compute_shader    = CShader("resources/code/shaders/raycast.cs.glsl").Program;
     display_shader            = Shader("resources/code/shaders/blit.vs.glsl", "resources/code/shaders/blit.fs.glsl").Program;
     orientation_widget_shader = Shader("resources/code/shaders/widget.vs.glsl", "resources/code/shaders/widget.fs.glsl").Program;
-    cout << "display shaders done." << endl;
+    cout << "display shaders ................... done." << endl;
 
     // ------------------------
     // compiling compute shaders - note that ___.cs.glsl is just a placeholder with the bare minimum to compile
 
     // Shapes
-    aabb_compute                 = CShader("resources/code/shaders/aabb.cs.glsl").Program;               cout << "aabb shader done." << endl;
-    cuboid_compute               = CShader("resources/code/shaders/cuboid.cs.glsl").Program;             cout << "cuboid shader done." << endl;
-    cylinder_compute             = CShader("resources/code/shaders/cylinder.cs.glsl").Program;           cout << "cylinder shader done." << endl;
-    ellipsoid_compute            = CShader("resources/code/shaders/ellipsoid.cs.glsl").Program;          cout << "ellipsoid shader done." << endl;
-    grid_compute                 = CShader("resources/code/shaders/grid.cs.glsl").Program;               cout << "grid shader done." << endl;
-    heightmap_compute            = CShader("resources/code/shaders/heightmap.cs.glsl").Program;          cout << "heightmap shader done." << endl;
-    perlin_compute               = CShader("resources/code/shaders/perlin.cs.glsl").Program;             cout << "perlin shader done." << endl;
-    sphere_compute               = CShader("resources/code/shaders/sphere.cs.glsl").Program;             cout << "sphere shader done." << endl;
-    tube_compute                 = CShader("resources/code/shaders/tube.cs.glsl").Program;               cout << "tube shader done." << endl;
-    triangle_compute             = CShader("resources/code/shaders/triangle.cs.glsl").Program;           cout << "triangle shader done." << endl;
+    aabb_compute                     = CShader("resources/code/shaders/aabb.cs.glsl").Program;               cout << "aabb shader ....................... done." << endl;
+    cuboid_compute                   = CShader("resources/code/shaders/cuboid.cs.glsl").Program;             cout << "cuboid shader ..................... done." << endl;
+    cylinder_compute                 = CShader("resources/code/shaders/cylinder.cs.glsl").Program;           cout << "cylinder shader ................... done." << endl;
+    ellipsoid_compute                = CShader("resources/code/shaders/ellipsoid.cs.glsl").Program;          cout << "ellipsoid shader .................. done." << endl;
+    grid_compute                     = CShader("resources/code/shaders/grid.cs.glsl").Program;               cout << "grid shader ....................... done." << endl;
+    heightmap_compute                = CShader("resources/code/shaders/heightmap.cs.glsl").Program;          cout << "heightmap shader .................. done." << endl;
+    perlin_compute                   = CShader("resources/code/shaders/perlin.cs.glsl").Program;             cout << "perlin shader ..................... done." << endl;
+    sphere_compute                   = CShader("resources/code/shaders/sphere.cs.glsl").Program;             cout << "sphere shader ..................... done." << endl;
+    tube_compute                     = CShader("resources/code/shaders/tube.cs.glsl").Program;               cout << "tube shader ....................... done." << endl;
+    triangle_compute                 = CShader("resources/code/shaders/triangle.cs.glsl").Program;           cout << "triangle shader ................... done." << endl;
 
     // GPU-side utilities
-    clear_all_compute            = CShader("resources/code/shaders/clear_all.cs.glsl").Program;          cout << "clear_all shader done." << endl;
-    unmask_all_compute           = CShader("resources/code/shaders/unmask_all.cs.glsl").Program;         cout << "unmask_all shader done." << endl;
-    invert_mask_compute          = CShader("resources/code/shaders/invert_mask.cs.glsl").Program;        cout << "invert_mask shader done." << endl;
-    mask_by_color_compute        = CShader("resources/code/shaders/mask_by_color.cs.glsl").Program;      cout << "mask_by_color shader done." << endl;
-    box_blur_compute             = CShader("resources/code/shaders/box_blur.cs.glsl").Program;           cout << "box blur shader done." << endl;
-    gaussian_blur_compute        = CShader("resources/code/shaders/___.cs.glsl").Program;
-    shift_compute                = CShader("resources/code/shaders/shift.cs.glsl").Program;              cout << "shift shader done." << endl;
-    copy_loadbuff_compute        = CShader("resources/code/shaders/copy_loadbuff.cs.glsl").Program;      cout << "loadbuffer copy shader done." << endl;
+    clear_all_compute                = CShader("resources/code/shaders/clear_all.cs.glsl").Program;          cout << "clear_all shader .................. done." << endl;
+    unmask_all_compute               = CShader("resources/code/shaders/unmask_all.cs.glsl").Program;         cout << "unmask_all shader ................. done." << endl;
+    invert_mask_compute              = CShader("resources/code/shaders/invert_mask.cs.glsl").Program;        cout << "invert_mask shader ................ done." << endl;
+    mask_by_color_compute            = CShader("resources/code/shaders/mask_by_color.cs.glsl").Program;      cout << "mask_by_color shader .............. done." << endl;
+    box_blur_compute                 = CShader("resources/code/shaders/box_blur.cs.glsl").Program;           cout << "box blur shader ................... done." << endl;
+    gaussian_blur_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
+    shift_compute                    = CShader("resources/code/shaders/shift.cs.glsl").Program;              cout << "shift shader ...................... done." << endl;
+    copy_loadbuff_compute            = CShader("resources/code/shaders/copy_loadbuff.cs.glsl").Program;      cout << "loadbuffer copy shader ............ done." << endl;
 
     // Lighting
-    lighting_clear_compute       = CShader("resources/code/shaders/light_clear.cs.glsl").Program;        cout << "light_clear shader done." << endl;
-    new_directional_lighting_compute = CShader("resources/code/shaders/new_directional.cs.glsl").Program;        cout << "new directional light shader done." << endl;
-    point_lighting_compute       = CShader("resources/code/shaders/point_light.cs.glsl").Program;        cout << "point light shader done." << endl;
-    cone_lighting_compute        = CShader("resources/code/shaders/cone_light.cs.glsl").Program;         cout << "cone light shader done." << endl;
-    ambient_occlusion_compute    = CShader("resources/code/shaders/ambient_occlusion.cs.glsl").Program;  cout << "ambient occlusion shader done." << endl;
-    fakeGI_compute               = CShader("resources/code/shaders/fakeGI.cs.glsl").Program;             cout << "fake global illumination shader done." << endl;
-    mash_compute                 = CShader("resources/code/shaders/mash.cs.glsl").Program;               cout << "lighting mash shader done." << endl;
+    lighting_clear_compute           = CShader("resources/code/shaders/light_clear.cs.glsl").Program;        cout << "light_clear shader ................ done." << endl;
+    new_directional_lighting_compute = CShader("resources/code/shaders/new_directional.cs.glsl").Program;    cout << "new directional light shader ...... done." << endl;
+    point_lighting_compute           = CShader("resources/code/shaders/point_light.cs.glsl").Program;        cout << "point light shader ................ done." << endl;
+    cone_lighting_compute            = CShader("resources/code/shaders/cone_light.cs.glsl").Program;         cout << "cone light shader ................. done." << endl;
+    ambient_occlusion_compute        = CShader("resources/code/shaders/ambient_occlusion.cs.glsl").Program;  cout << "ambient occlusion shader .......... done." << endl;
+    fakeGI_compute                   = CShader("resources/code/shaders/fakeGI.cs.glsl").Program;             cout << "fake global illumination shader ... done." << endl;
+    mash_compute                     = CShader("resources/code/shaders/mash.cs.glsl").Program;               cout << "lighting mash shader .............. done." << endl;
 
 }
 
