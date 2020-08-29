@@ -172,7 +172,8 @@ void main()
 		}
 		else
 		{
-			imageStore(current, Global_Loc, vec4(0));
+			imageStore(current, Global_Loc, clear_color);
+			// imageStore(current, Global_Loc, vec4(0));
 		}
 	}  // else, this part of the tile falls outside of the image bounds, no operation should take place
 }
