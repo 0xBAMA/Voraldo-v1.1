@@ -217,7 +217,7 @@ class GLContainer
         GLuint invert_mask_compute;
         GLuint mask_by_color_compute;
         GLuint box_blur_compute;
-        GLuint gaussian_blur_compute;
+        GLuint gaussian_blur_compute; 
         GLuint shift_compute;
         GLuint copy_loadbuff_compute;
 

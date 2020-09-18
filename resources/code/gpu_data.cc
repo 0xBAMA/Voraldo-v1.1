@@ -28,6 +28,8 @@ void GLContainer::display_block()
     if(redraw_flag)
     {
         // cout << "redrawing" << endl;
+        auto t1 = std::chrono::high_resolution_clock::now();
+
 
         // do the tile based rendering using the raycast compute shader
         glUseProgram(display_compute_shader);
@@ -66,6 +68,9 @@ void GLContainer::display_block()
         }
 
         glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT ); // make sure everything finishes before blitting
+        auto t2 = std::chrono::high_resolution_clock::now();
+
+        cout << "tiled refresh took " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
 
         redraw_flag = false; // we won't need to draw anything again, till something changes
     }
@@ -153,7 +158,7 @@ void GLContainer::compile_shaders()
     invert_mask_compute              = CShader("resources/code/shaders/invert_mask.cs.glsl").Program;        cout << "invert_mask shader ................ done." << endl;
     mask_by_color_compute            = CShader("resources/code/shaders/mask_by_color.cs.glsl").Program;      cout << "mask_by_color shader .............. done." << endl;
     box_blur_compute                 = CShader("resources/code/shaders/box_blur.cs.glsl").Program;           cout << "box blur shader ................... done." << endl;
-    gaussian_blur_compute            = CShader("resources/code/shaders/___.cs.glsl").Program;
+    gaussian_blur_compute            = CShader("resources/code/shaders/gauss_blur.cs.glsl").Program;         cout << "gaussian blur shader .............. done." << endl;
     shift_compute                    = CShader("resources/code/shaders/shift.cs.glsl").Program;              cout << "shift shader ...................... done." << endl;
     copy_loadbuff_compute            = CShader("resources/code/shaders/copy_loadbuff.cs.glsl").Program;      cout << "loadbuffer copy shader ............ done." << endl;
 
@@ -996,6 +1001,21 @@ void GLContainer::gaussian_blur(int radius, bool touch_alpha, bool respect_mask)
     redraw_flag = true;
 
     // I think I'm going to restrict the range of radii, since I'm not sure about what the best way to do different sized kernels is
+    swap_blocks();
+    glUseProgram(gaussian_blur_compute);
+
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "radius"), radius);
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "respect_mask"), respect_mask);
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "touch_alpha"), touch_alpha);
+
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "current"), 2+tex_offset);
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "current_mask"), 4+tex_offset);
+
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "previous"), 3-tex_offset);
+    glUniform1i(glGetUniformLocation(gaussian_blur_compute, "previous_mask"), 5-tex_offset);
+
+    glDispatchCompute( DIM/8, DIM/8, DIM/8 );
+    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
         // limiter
@@ -1069,6 +1089,7 @@ void GLContainer::compute_new_directional_lighting(float theta, float phi, float
     glDispatchCompute( DIM/8, DIM/8, DIM/8 ); //workgroup is 8x8x8
 
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+    // auto t1 = std::chrono::high_resolution_clock::now();
 
     // auto t2 = std::chrono::high_resolution_clock::now();
 
