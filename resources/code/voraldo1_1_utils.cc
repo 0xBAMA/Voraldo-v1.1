@@ -220,21 +220,21 @@ void Voraldo::create_window()
     // glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &textureCount);
     // cout << endl << "GL_MAX_3D_TEXTURE_SIZE returned:" << textureCount << endl << endl;
 
-    // GLint data[3];
+    GLint data[3];
 
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,0, &data[0]);
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,1, &data[1]);
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,2, &data[2]);
-    // cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_COUNT returned x:" << data[0] << " y:" << data[1] << " z:" << data[2] << endl;
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,0, &data[0]);
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,1, &data[1]);
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_COUNT,2, &data[2]);
+    cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_COUNT returned x:" << data[0] << " y:" << data[1] << " z:" << data[2] << endl;
 
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,0, &data[0]);
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,1, &data[1]);
-    // glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,2, &data[2]);
-    // cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_SIZE returned x:" << data[0] << " y:" << data[1] << " z:" << data[2] << endl;
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,0, &data[0]);
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,1, &data[1]);
+    glGetIntegeri_v( GL_MAX_COMPUTE_WORK_GROUP_SIZE,2, &data[2]);
+    cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_SIZE returned x:" << data[0] << " y:" << data[1] << " z:" << data[2] << endl;
 
-    // GLint max;
-    // glGetIntegerv(  GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &max);
-    // cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS returned: " << max << endl << endl;
+    GLint max;
+    glGetIntegerv(  GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &max);
+    cout << endl << "GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS returned: " << max << endl << endl;
 
     // glGetIntegerv(  GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &max);
     // cout << endl << "GL_MAX_COMPUTE_SHARED_MEMORY_SIZE returned: " << max << " bytes" << endl << endl;
