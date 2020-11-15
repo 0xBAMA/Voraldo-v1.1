@@ -35,6 +35,9 @@ uniform layout(r8) image3D lighting;
 uniform int x_offset;
 uniform int y_offset;
 
+uniform int clickndragx;
+uniform int clickndragy;
+
 //gl_GlobalInvocationID will define the tile size, so doing anything to define it here would be redundant
 // this shader is general up to tile sizes of 2048x2048, since those are the maximum dispatch values
 
@@ -142,7 +145,7 @@ vec4 get_color_for_pixel(vec3 org, vec3 dir)
 
 void main()
 {
-	ivec2 Global_Loc = ivec2(gl_GlobalInvocationID.xy) + ivec2(x_offset, y_offset);
+	ivec2 Global_Loc = ivec2(gl_GlobalInvocationID.xy) + ivec2(x_offset+clickndragx, y_offset+clickndragy);
 	ivec2 dimensions = ivec2(imageSize(current));
 	
 	float aspect_ratio = float(dimensions.y) / float(dimensions.x);
@@ -163,7 +166,8 @@ void main()
 	mat3 rottheta = rotationMatrix(vec3(0,1,0), theta);
 	org *= rottheta;
 	dir *= rottheta;
-	
+
+  Global_Loc -= ivec2(clickndragx, clickndragy);
 	if(Global_Loc.x < dimensions.x && Global_Loc.y < dimensions.y)
 	{  // we are good to check the ray against the AABB
 		if(hit(org,dir))

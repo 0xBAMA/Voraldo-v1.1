@@ -77,9 +77,9 @@ constexpr double pi = 3.14159265358979323846;
 
 // supersampling factor for main display shader
 // #define SSFACTOR 5.0   // tanks performance
-// #define SSFACTOR 2.8  // this is for 8x multisampling
+#define SSFACTOR 2.8  // this is for 8x multisampling
 // #define SSFACTOR 2.0  // this is for 4x multisampling
-#define SSFACTOR 1.65
+// #define SSFACTOR 1.65
 // #define SSFACTOR 1.25  // small amount of multisampling
 // #define SSFACTOR 1.0  // no multisampling
 // #define SSFACTOR 0.4 // this is <1x multisampling
@@ -88,7 +88,8 @@ constexpr double pi = 3.14159265358979323846;
 #define TILESIZE 64
 
 // this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
-#define DIM 256
+#define DIM 512
+// #define DIM 256
 
 // this is effectively the shadowmap dimension - probaby want to reduce this eventually
 #define LIGHT_DIM 2048

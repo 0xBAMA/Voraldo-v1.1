@@ -146,7 +146,9 @@ class GLContainer
         float alpha_correction_power = 2.0;
 
         unsigned int screen_width, screen_height;
-
+        int clickndragx = 0;
+        int clickndragy = 0;
+        
     private:
 
         bool redraw_flag = true;

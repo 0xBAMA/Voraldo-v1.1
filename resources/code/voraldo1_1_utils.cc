@@ -89,7 +89,7 @@ void Voraldo::create_window()
 
     // pulling these out because I'm going to try to span the whole screen with
     // the window, in a way that's flexible on different resolution screens
-    total_screen_width = dm.w;
+    total_screen_width = dm.w*3;
     total_screen_height = dm.h;
 
     window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
@@ -1752,6 +1752,19 @@ void Voraldo::draw_everything()
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_c)
             show_controls = !show_controls;
 
+
+        // till I come up with a good way to maintain state for the mouse click and drag, this is how that offset is controlled
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_h)
+            GPU_Data.clickndragx += 5;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_l)
+            GPU_Data.clickndragx -= 5;
+
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_k)
+            GPU_Data.clickndragy += 5;
+        if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_j)
+            GPU_Data.clickndragy -= 5;
+
+        
         // specific directions
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)
             GPU_Data.theta = 0.0;
@@ -1763,6 +1776,24 @@ void Voraldo::draw_everything()
             GPU_Data.theta = 3.0*(pi/2.0);
 
 
+        if(event.type == SDL_MOUSEMOTION && (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))) // mouse moved, left button down
+        {
+            int x,y;
+            static glm::ivec2 prev_mouseloc = glm::ivec2(0,0);
+
+            // get the location of the mouse
+            SDL_GetMouseState(&x, &y);
+                
+            // how much has the mouse moved since the last time this if statement evaluated true
+            GPU_Data.clickndragx += prev_mouseloc.x-x;
+            GPU_Data.clickndragy -= prev_mouseloc.y-y;
+
+            cout << "clickndragx " << GPU_Data.clickndragx << " clickndragy " << GPU_Data.clickndragy << endl;
+            
+            prev_mouseloc = glm::ivec2(x, y);
+        }
+
+        
         if(event.type == SDL_MOUSEWHEEL)  //allow scroll to do the same thing as +/-
         {
             if(event.wheel.y > 0) // scroll up

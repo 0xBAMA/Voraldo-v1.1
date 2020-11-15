@@ -12,15 +12,19 @@ void GLContainer::display_block()
 
     static float temp_scale;
     static float temp_theta;
+    static float temp_clickndragx;
+    static float temp_clickndragy;
     static float temp_phi;
     static float acp; // alpha correction power
     static glm::vec4 temp_clear_color;
 
-    if((temp_scale != scale) || (temp_theta != theta) || (temp_phi != phi) || (acp != alpha_correction_power) || (clear_color != temp_clear_color))
+    if((temp_scale != scale) || (temp_theta != theta) || (temp_clickndragx != clickndragx) || (temp_clickndragy != clickndragy) || (temp_phi != phi) || (acp != alpha_correction_power) || (clear_color != temp_clear_color))
         redraw_flag = true;
 
     temp_scale = scale;
     temp_theta = theta;
+    temp_clickndragx = clickndragx;
+    temp_clickndragy = clickndragy;
     temp_phi = phi;
     acp = alpha_correction_power;
     temp_clear_color = clear_color;
@@ -46,6 +50,10 @@ void GLContainer::display_block()
         // zoom parameter
         glUniform1f(glGetUniformLocation(display_compute_shader, "scale"), scale);
 
+        // click and drag
+        glUniform1i(glGetUniformLocation(display_compute_shader, "clickndragx"), clickndragx);
+        glUniform1i(glGetUniformLocation(display_compute_shader, "clickndragy"), clickndragy);
+        
         // clear color
         glUniform4fv(glGetUniformLocation(display_compute_shader, "clear_color"), 1, glm::value_ptr(clear_color));
 
