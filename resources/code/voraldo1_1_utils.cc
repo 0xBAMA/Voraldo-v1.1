@@ -89,7 +89,13 @@ void Voraldo::create_window()
 
     // pulling these out because I'm going to try to span the whole screen with
     // the window, in a way that's flexible on different resolution screens
+
+#ifdef TRIPLE_MONITOR
     total_screen_width = dm.w*3;
+#else
+    total_screen_width = dm.w;
+#endif
+
     total_screen_height = dm.h;
 
     window = SDL_CreateWindow( "OpenGL Window", 0, 0, total_screen_width, total_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS );
