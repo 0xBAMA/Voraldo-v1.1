@@ -123,7 +123,7 @@ class GLContainer
         void copy_loadbuffer(bool respect_mask);
 
         // Brent Werness's Voxel Automata Terrain
-        std::string vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask);
+        std::string vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask, glm::bvec3 mins, glm::bvec3 maxs);
 
         // load
         void load(std::string filename, bool respect_mask);

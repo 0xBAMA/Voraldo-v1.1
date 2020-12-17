@@ -12,13 +12,18 @@
 using std::cout;
 using std::endl;
 
+
+
+
 class voxel_automata_terrain
 {
 	public:
-		voxel_automata_terrain(int levels_deep, float flip_p, std::string rule, int initmode, float lamb, float bet, float mg)
+		voxel_automata_terrain(int levels_deep, float flip_p, std::string rule, int initmode, float lamb, float bet, float mg, glm::bvec3 minimums, glm::bvec3 maximums)
 			:L(levels_deep),
 			 K((1 << levels_deep) + 1),
 			 flipP(flip_p),
+			 mins(minimums),
+			 maxs(maximums),
 			 lambda(lamb),
 			 beta(bet),
 			 mag(mg)
@@ -31,7 +36,7 @@ class voxel_automata_terrain
 			for(auto & x : cubeRule)
 				for(auto & y : x)
 					y = 0;
-
+			
 
 			// resize the faceRule
 			faceRule.resize(7);
@@ -61,12 +66,28 @@ class voxel_automata_terrain
 				for(auto & y : x)
 					y.resize(K);
 			}
-			// initialize with zeroes
+			
+			// initialize with zeroes, or fill for the faces
 			for(auto & x : state)
 				for(auto & y : x)
 					for(auto & z : y)
-						z = 0;
-
+					{	
+						if(minimums.x && &x == std::addressof(*state.begin()))
+							z = fill(initmode);
+						else if(maximums.x && &x == std::addressof(*state.end())-1)
+							z = fill(initmode);
+						else if(minimums.y && &y == std::addressof(*x.begin()))
+							z = fill(initmode);
+						else if(maximums.y && &y == std::addressof(*x.end())-1)
+							z = fill(initmode);
+						else if(minimums.z && &z == std::addressof(*y.begin()))
+							z = fill(initmode);
+						else if(maximums.z && &z == std::addressof(*y.end())-1)
+							z = fill(initmode);
+						else
+							z = 0;
+					}
+						
 			// interpreting rule input
 			if(rule == std::string("r"))
 			{
@@ -82,7 +103,7 @@ class voxel_automata_terrain
 				readShortRule(rule);
 			}
 
-			initState(initmode);
+			// initState(initmode); // now handled above
 			evalState();
 
 
@@ -111,6 +132,9 @@ class voxel_automata_terrain
 		std::vector<std::vector<int>> cubeRule;
 		std::vector<std::vector<int>> faceRule;
 		std::vector<std::vector<int>> edgeRule;
+		
+		glm::bvec3 mins = glm::bvec3(1,0,0);
+		glm::bvec3 maxs = glm::bvec3(0,0,0);
 
 		void dumpState()
 		{
@@ -125,6 +149,18 @@ class voxel_automata_terrain
 					std::cout << std::endl;
 				}
 				std::cout << std::endl;
+			}
+		}
+
+		int fill(int fill)
+		{
+			switch (fill) 
+			{
+				case 0: return 0;                break; // fill with zeroes
+				case 1: return 1;                break; // fill with ones
+				case 2: return 2;                break; // fill with twos
+				case 3: return int(random(2))+1; break; // fill with random numbers [0-2 inclusive]
+				default: return 0;
 			}
 		}
 

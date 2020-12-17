@@ -1367,7 +1367,7 @@ void GLContainer::copy_loadbuffer(bool respect_mask)
 
 
    // Brent Werness's Voxel Automata Terrain - set redraw_flag to true
-std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask)
+std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::vec4 color0, glm::vec4 color1, glm::vec4 color2, float lambda, float beta, float mag, bool respect_mask, glm::bvec3 mins, glm::bvec3 maxs)
 {
     redraw_flag = true;
 
@@ -1387,7 +1387,7 @@ std::string GLContainer::vat(float flip, std::string rule, int initmode, glm::ve
 
     // check for equality with 'r' or 'i' to do random or isingRandom, else interpret as a shortrule
     // I want to add different init modes, to seed multiple faces instead of just the one
-    voxel_automata_terrain v(dimension, flip, rule, initmode, lambda, beta, mag);
+    voxel_automata_terrain v(dimension, flip, rule, initmode, lambda, beta, mag, mins, maxs);
 
     // pull out the texture data
     std::vector<unsigned char> loaded_bytes; // used the same way as load(), below

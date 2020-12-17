@@ -1093,7 +1093,20 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text("3 - fill side with random values");
                     ImGui::SliderInt(" mode", &initmode, 0, 3);
                     ImGui::Text(" ");
+                    
+                    static bool plusx, plusy, plusz;
+                    static bool minusx, minusy, minusz;
+                    
+                    ImGui::Checkbox(" fill -x", &minusx);
+						  ImGui::Checkbox(" fill +x", &plusx);
 
+                    ImGui::Checkbox(" fill -y", &minusy);
+						  ImGui::Checkbox(" fill +y", &plusy);
+
+                    ImGui::Checkbox(" fill -z", &minusz);
+						  ImGui::Checkbox(" fill +z", &plusz);
+						  
+						  
                     // three colors
                     ImGui::ColorEdit4(" State 0", (float*)&color0, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
                     ImGui::ColorEdit4(" State 1", (float*)&color1, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
@@ -1113,7 +1126,7 @@ void Voraldo::ControlWindow(bool *open)
                         col1 = glm::vec4(color1.x, color1.y, color1.z, color1.w);
                         col2 = glm::vec4(color2.x, color2.y, color2.z, color2.w);
 
-                        std::string temp = GPU_Data.vat(flip, std::string(str0), initmode, col0, col1, col2, lambda, beta, mag, respect_mask);  //assign with the function call
+                        std::string temp = GPU_Data.vat(flip, std::string(str0), initmode, col0, col1, col2, lambda, beta, mag, respect_mask, glm::bvec3(minusx, minusy, minusz), glm::bvec3(plusx, plusy, plusz));  //assign with the function call
 
                         strcpy(str0, temp.c_str()); // you get to see how the random rule you generated, or retain the rule you entered
                     }
