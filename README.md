@@ -10,18 +10,19 @@ For more context, I have uploaded a number of videos which detail its use, [to a
 
 Some of the bigger changes I have planned:
  
- - completely redoing the menu - add top menu bar, togglable overlay with fps + fps graph, and a small widget that helps the user stay oriented in 3d space
+ - ~~completely redoing the menu - add top menu bar, togglable overlay with fps + fps graph, and a small widget that helps the user stay oriented in 3d space~~
  - switching to uimage3D buffers, for more consistent behavior
- - organizing buffers better
+ - ~~organizing buffers better~~
  - incorporating a copy/paste function
  - some SDF-based drawing functions (smooth min, fractals)
  - making the lighting buffer RGB, start looking at doing light with color associated with it
- - compass rose, to show block orientation (helps with positioning)
- - optimization idea: keep a bool that tells whether or not things need to be re-rendered via the raycast compute shader each frame, else just display existing texture
+ - ~~compass rose, to show block orientation (helps with positioning)~~
+ - ~~optimization idea: keep a bool that tells whether or not things need to be re-rendered via the raycast compute shader each frame, else just display existing texture~~
  - shape batching, like VIVS did - probably using SSBOs this time instead of uniform buffers
  - LUA scripting - using the same interface as the menu buttons do
- - change box blur to a gaussian kernel - weight color contribution by cell alpha
- - point lights
+ - ~~change box blur to a gaussian kernel - weight color contribution by cell alpha~~
+ - ~~point lights~~
+ - cone lights
  - lighting cache/animation system
  - uniform environment presented to all shaders
- - addition of a load buffer, so that the VAT and Load operations can be made to respect the mask
+ - ~~addition of a load buffer, so that the VAT and Load operations can be made to respect the mask~~
