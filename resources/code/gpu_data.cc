@@ -506,7 +506,18 @@ void GLContainer::load_textures()
     // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     cout << "...........done." << endl;
-
+    
+    class MyNumPunct : public std::numpunct<char>
+    {
+    protected:
+        virtual char do_thousands_sep() const { return ','; }
+        virtual std::string do_grouping() const { return "\03"; }
+    };
+    
+    //supposed to add separators to numbers
+      std::cout.imbue( std::locale( std::locale::classic(), new MyNumPunct ) );
+    
+    
     cout << "color voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*4*2 << " bytes)......." ;
     // main block front color buffer - initialize with xor
     glActiveTexture(GL_TEXTURE0 + 2);
