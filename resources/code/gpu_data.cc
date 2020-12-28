@@ -452,7 +452,9 @@ void GLContainer::load_textures()
 
     std::default_random_engine generator;
     std::uniform_int_distribution<unsigned char> distribution(0,255);
-
+    
+    cout << "generating init xor texture......";
+    
     for(unsigned int x = 0; x < DIM; x++)
         for(unsigned int y = 0; y < DIM; y++)
             for(unsigned int z = 0; z < DIM; z++)
@@ -463,7 +465,7 @@ void GLContainer::load_textures()
                 // ucxor.push_back(distribution(generator)); // alpha channel gets 255
             }
 
-
+    cout << "....done." << endl;
     // for(unsigned int y = 0; y < (screen_height*SSFACTOR); y++)
     //     for(unsigned int x = 0; x < (screen_width*SSFACTOR); x++)
     //     {
@@ -478,10 +480,13 @@ void GLContainer::load_textures()
     zeroes.resize(3*DIM*DIM*DIM, 0); // fill the array with zeroes
 
 
+    cout << "Creating texture handles...";
     // create all the texture handles
     glGenTextures(13, &textures[0]);
+    cout << "........done." << endl;
+    
 
-
+    cout << "rendertextures.....";
     // main render texture - this is going to be a rectangular texture, larger than the screen so we can do some supersampling
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_RECTANGLE, textures[0]);
@@ -500,7 +505,9 @@ void GLContainer::load_textures()
     // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    cout << "...........done." << endl;
 
+    cout << "color voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*4*2 << " bytes)......." ;
     // main block front color buffer - initialize with xor
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_3D, textures[2]);
@@ -517,8 +524,9 @@ void GLContainer::load_textures()
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
-
-
+    
+    cout << "mask voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*2 << " bytes)......." ;
+    
     // main block front mask buffer - initially empty
     glActiveTexture(GL_TEXTURE0 + 4);
     glBindTexture(GL_TEXTURE_3D, textures[4]);
@@ -536,6 +544,9 @@ void GLContainer::load_textures()
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(5, textures[5], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
+    cout << "...........done." << endl;
+
+    cout << "light buffer voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*2 << " bytes)......." ;
 
     // display lighting buffer - initialize with some base value representing neutral coloration
     glActiveTexture(GL_TEXTURE0 + 6);
@@ -554,6 +565,7 @@ void GLContainer::load_textures()
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(7, textures[7], 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
 
+    cout << "...........done." << endl;
 
     // copy/paste front buffer - initally empty
     glActiveTexture(GL_TEXTURE0 + 8);
@@ -581,6 +593,8 @@ void GLContainer::load_textures()
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(10, textures[10], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
+    
+    cout << "perlin.....";
 
     // perlin noise - initialize with noise at some default scaling
     glActiveTexture(GL_TEXTURE0 + 11);
@@ -594,7 +608,8 @@ void GLContainer::load_textures()
     // 3d texture for perlin noise - DIM on a side
     generate_perlin_noise(0.014, 0.04, 0.014);
 
-
+    cout << ".............done." << endl;
+    cout << "heightmap............";
     // heightmap - initialize with a generated diamond square heightmap
     glActiveTexture(GL_TEXTURE0 + 12);
     glBindTexture(GL_TEXTURE_2D, textures[12]);
@@ -605,6 +620,7 @@ void GLContainer::load_textures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     // 2d texture for representation of a heightmap (greyscale - use some channels to hold more data?) - also, DIM on a side
     generate_heightmap_diamond_square();
+    cout << "........done.";
 }
 
 
