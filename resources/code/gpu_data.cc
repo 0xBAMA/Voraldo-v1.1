@@ -453,7 +453,7 @@ void GLContainer::load_textures()
     std::default_random_engine generator;
     std::uniform_int_distribution<unsigned char> distribution(0,255);
     
-    cout << "generating init xor texture......";
+    cout << "generating init xor texture.....";
     
     for(unsigned int x = 0; x < DIM; x++)
         for(unsigned int y = 0; y < DIM; y++)
@@ -483,7 +483,7 @@ void GLContainer::load_textures()
     cout << "Creating texture handles...";
     // create all the texture handles
     glGenTextures(13, &textures[0]);
-    cout << "........done." << endl;
+    cout << "...........done." << endl;
     
 
     cout << "rendertextures.....";
@@ -535,6 +535,7 @@ void GLContainer::load_textures()
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindImageTexture(3, textures[3], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
+    cout << "...........done." << endl;
     
     cout << "mask voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*2 << " bytes)......." ;
     
@@ -631,7 +632,7 @@ void GLContainer::load_textures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     // 2d texture for representation of a heightmap (greyscale - use some channels to hold more data?) - also, DIM on a side
     generate_heightmap_diamond_square();
-    cout << "........done.";
+    cout << "........done." << endl;
 }
 
 

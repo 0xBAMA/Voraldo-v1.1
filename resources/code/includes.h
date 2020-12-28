@@ -75,7 +75,7 @@ using std::endl;
 // pi definition
 constexpr double pi = 3.14159265358979323846;
 
-#define TRIPLE_MONITOR // enable to span all three monitors
+/* #define TRIPLE_MONITOR // enable to span all three monitors */
 
 // supersampling factor for main display shader
 // #define SSFACTOR 5.0   // tanks performance
