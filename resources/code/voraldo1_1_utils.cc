@@ -1061,7 +1061,10 @@ void Voraldo::ControlWindow(bool *open)
                     static float flip;
 
                     static char str0[256] = "";
-
+                    
+                    static bool plusx, plusy, plusz;
+                    static bool minusx, minusy, minusz;
+                    
                     //config options for this operation
                     WrappedText("This is an interesting way to generate shapes, developed by Brent Werness - enter a rule, r for Random or i for IsingRandom", windowsize.x); // may want to parameterize this further, with beta, lambda, mag - just want to get it working first
                     ImGui::Text(" ");
@@ -1069,7 +1072,20 @@ void Voraldo::ControlWindow(bool *open)
                     // string entry, letting the user input a rule
                     ImGui::Text("Enter base62 encoded rule, r or i");
                     ImGui::InputTextWithHint("", "", str0, IM_ARRAYSIZE(str0));
+                    
+                    if (ImGui::Button("Compute", ImVec2(100, 22)))
+                    {
+                        // invoke the constructor, etc - return a string from the OpenGL_container::vat(...), and put it in str0
+                        glm::vec4 col0, col1, col2;
+                        col0 = glm::vec4(color0.x, color0.y, color0.z, color0.w);
+                        col1 = glm::vec4(color1.x, color1.y, color1.z, color1.w);
+                        col2 = glm::vec4(color2.x, color2.y, color2.z, color2.w);
 
+                        std::string temp = GPU_Data.vat(flip, std::string(str0), initmode, col0, col1, col2, lambda, beta, mag, respect_mask, glm::bvec3(minusx, minusy, minusz), glm::bvec3(plusx, plusy, plusz));  //assign with the function call
+
+                        strcpy(str0, temp.c_str()); // you get to see how the random rule you generated, or retain the rule you entered
+                    }
+                    
                     // flip slider (float)
                     ImGui::Text("Make nonzero for stochastic result");
                     ImGui::SliderFloat(" flip", &flip, 0.0f, 1.0f, "%.3f");
@@ -1078,14 +1094,42 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text("Lambda is a parameter for Random");
                     ImGui::SliderFloat(" lambda", &lambda, 0.0f, 1.0f, "%.3f");
                     ImGui::Text(" ");
+                    
+                    if (ImGui::Button("Compute Random", ImVec2(100, 22)))
+                    {
+                        // invoke the constructor, etc - return a string from the OpenGL_container::vat(...), and put it in str0
+                        glm::vec4 col0, col1, col2;
+                        col0 = glm::vec4(color0.x, color0.y, color0.z, color0.w);
+                        col1 = glm::vec4(color1.x, color1.y, color1.z, color1.w);
+                        col2 = glm::vec4(color2.x, color2.y, color2.z, color2.w);
 
+                        std::string temp = GPU_Data.vat(flip, std::string("r"), initmode, col0, col1, col2, lambda, beta, mag, respect_mask, glm::bvec3(minusx, minusy, minusz), glm::bvec3(plusx, plusy, plusz));  //assign with the function call
+
+                        strcpy(str0, temp.c_str()); // you get to see how the random rule you generated, or retain the rule you entered
+                    }
+
+                    
+                    ImGui::Text(" ");
                     ImGui::Text("Beta and Mag are parameters");
-                    ImGui::Text("for IsingRandom");
+                    ImGui::Text("for IRandom");
                     ImGui::SliderFloat(" beta", &beta, 0.0f, 1.0f, "%.3f");
                     ImGui::SliderFloat(" mag", &mag, 0.0f, 1.0f, "%.3f");
                     ImGui::Text(" ");
+                    
+                    if (ImGui::Button("Compute IRandom", ImVec2(100, 22)))
+                    {
+                        // invoke the constructor, etc - return a string from the OpenGL_container::vat(...), and put it in str0
+                        glm::vec4 col0, col1, col2;
+                        col0 = glm::vec4(color0.x, color0.y, color0.z, color0.w);
+                        col1 = glm::vec4(color1.x, color1.y, color1.z, color1.w);
+                        col2 = glm::vec4(color2.x, color2.y, color2.z, color2.w);
 
+                        std::string temp = GPU_Data.vat(flip, std::string("i"), initmode, col0, col1, col2, lambda, beta, mag, respect_mask, glm::bvec3(minusx, minusy, minusz), glm::bvec3(plusx, plusy, plusz));  //assign with the function call
 
+                        strcpy(str0, temp.c_str()); // you get to see how the random rule you generated, or retain the rule you entered
+                    }
+
+                    ImGui::Text(" ");
                     // mode slider (int)
                     ImGui::Text("0 - fill side with 0");
                     ImGui::Text("1 - fill side with 1");
@@ -1093,10 +1137,7 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text("3 - fill side with random values");
                     ImGui::SliderInt(" mode", &initmode, 0, 3);
                     ImGui::Text(" ");
-                    
-                    static bool plusx, plusy, plusz;
-                    static bool minusx, minusy, minusz;
-                    
+
                     ImGui::Checkbox(" fill -x", &minusx);
 						  ImGui::Checkbox(" fill +x", &plusx);
 
@@ -1118,18 +1159,7 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::Text(" ");
                     ImGui::SetCursorPosX(16);
 
-                    if (ImGui::Button("Compute", ImVec2(100, 22)))
-                    {
-                        // invoke the constructor, etc - return a string from the OpenGL_container::vat(...), and put it in str0
-                        glm::vec4 col0, col1, col2;
-                        col0 = glm::vec4(color0.x, color0.y, color0.z, color0.w);
-                        col1 = glm::vec4(color1.x, color1.y, color1.z, color1.w);
-                        col2 = glm::vec4(color2.x, color2.y, color2.z, color2.w);
 
-                        std::string temp = GPU_Data.vat(flip, std::string(str0), initmode, col0, col1, col2, lambda, beta, mag, respect_mask, glm::bvec3(minusx, minusy, minusz), glm::bvec3(plusx, plusy, plusz));  //assign with the function call
-
-                        strcpy(str0, temp.c_str()); // you get to see how the random rule you generated, or retain the rule you entered
-                    }
 
                     ImGui::EndTabItem();
                 }
