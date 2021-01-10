@@ -485,8 +485,19 @@ void GLContainer::load_textures()
     glGenTextures(13, &textures[0]);
     cout << "...........done." << endl;
     
+    class MyNumPunct : public std::numpunct<char>
+    {
+    protected:
+        virtual char do_thousands_sep() const { return ','; }
+        virtual std::string do_grouping() const { return "\03"; }
+    };
+    
+    //supposed to add separators to numbers
+    std::cout.imbue( std::locale( std::locale::classic(), new MyNumPunct ) );
 
-    cout << "rendertextures.....";
+
+      
+    cout << "rendertextures (" << int(SSFACTOR)*int(SSFACTOR)*screen_width*screen_height*4 << " bytes).....";
     // main render texture - this is going to be a rectangular texture, larger than the screen so we can do some supersampling
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_RECTANGLE, textures[0]);
@@ -507,16 +518,7 @@ void GLContainer::load_textures()
 
     cout << "...........done." << endl;
     
-    class MyNumPunct : public std::numpunct<char>
-    {
-    protected:
-        virtual char do_thousands_sep() const { return ','; }
-        virtual std::string do_grouping() const { return "\03"; }
-    };
-    
-    //supposed to add separators to numbers
-      std::cout.imbue( std::locale( std::locale::classic(), new MyNumPunct ) );
-    
+
     
     cout << "color voxel blocks at " << DIM << " resolution (" << DIM*DIM*DIM*4*2 << " bytes)......." ;
     // main block front color buffer - initialize with xor
@@ -606,7 +608,7 @@ void GLContainer::load_textures()
     glBindImageTexture(10, textures[10], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
     
-    cout << "perlin.....";
+    cout << "perlin texture generation....." << std::flush;
 
     // perlin noise - initialize with noise at some default scaling
     glActiveTexture(GL_TEXTURE0 + 11);
@@ -759,7 +761,131 @@ void GLContainer::draw_ellipsoid(glm::vec3 center, glm::vec3 radii, glm::vec3 ro
     glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
-       // grid
+void GLContainer::draw_regular_icosahedron(double x_rot, double y_rot, double z_rot, double scale, glm::vec3 center_point, glm::vec4 vertex_material, double verticies_radius, glm::vec4 edge_material, double edge_thickness, glm::vec4 face_material, float face_thickness, bool draw, bool mask)
+{
+    
+    double phi = (1 + std::sqrt(5.0))/2.0;
+
+//rotation matricies allowing rotation of the polyhedron
+    glm::mat3 rotation_x_axis;
+    //refernces [column][row] - sin and cos take arguments in radians
+    rotation_x_axis[0][0] = 1;                       rotation_x_axis[1][0] = 0;                      rotation_x_axis[2][0] = 0;
+    rotation_x_axis[0][1] = 0;                       rotation_x_axis[1][1] = std::cos(x_rot);        rotation_x_axis[2][1] = -1.0*std::sin(x_rot);
+    rotation_x_axis[0][2] = 0;                       rotation_x_axis[1][2] = std::sin(x_rot);        rotation_x_axis[2][2] = std::cos(x_rot);
+
+    glm::mat3 rotation_y_axis;
+    rotation_y_axis[0][0] = std::cos(y_rot);         rotation_y_axis[1][0] = 0;                      rotation_y_axis[2][0] = std::sin(y_rot);
+    rotation_y_axis[0][1] = 0;                       rotation_y_axis[1][1] = 1;                      rotation_y_axis[2][1] = 0;
+    rotation_y_axis[0][2] = -1.0*std::sin(y_rot);    rotation_y_axis[1][2] = 0;                      rotation_y_axis[2][2] = std::cos(y_rot);
+
+    glm::mat3 rotation_z_axis;
+    rotation_z_axis[0][0] = std::cos(z_rot);         rotation_z_axis[1][0] = -1.0*std::sin(z_rot);   rotation_z_axis[2][0] = 0;
+    rotation_z_axis[0][1] = std::sin(z_rot);         rotation_z_axis[1][1] = std::cos(z_rot);        rotation_z_axis[2][1] = 0;
+    rotation_z_axis[0][2] = 0;                       rotation_z_axis[1][2] = 0;                      rotation_z_axis[2][2] = 1;
+
+    glm::mat3 rotation = rotation_x_axis * rotation_y_axis * rotation_z_axis; //multiply these all together
+
+    glm::vec3 a,b,c,d,e,f,g,h,i,j,k,l;
+//the work for this is in my journal, the entry on 3/1/2019, done for v06 of Voraldo
+//it is based on the idea that the points of a regular icosahedron lie on the points defined by three mutually orthogonal golden rectangles that share a center point at the origin
+//i.e. these rectanges are abcd,efgh and ijkl
+    a = rotation * glm::vec3(  0,  1*scale,  phi*scale) + center_point; e = rotation * glm::vec3(  1*scale,  phi*scale,  0) + center_point; i = rotation * glm::vec3(  phi*scale,  0,  1*scale) + center_point;
+    b = rotation * glm::vec3(  0,  1*scale, -phi*scale) + center_point; f = rotation * glm::vec3( -1*scale, -phi*scale,  0) + center_point; j = rotation * glm::vec3(  phi*scale,  0, -1*scale) + center_point;
+    c = rotation * glm::vec3(  0, -1*scale,  phi*scale) + center_point; g = rotation * glm::vec3( -1*scale,  phi*scale,  0) + center_point; k = rotation * glm::vec3( -phi*scale,  0,  1*scale) + center_point;
+    d = rotation * glm::vec3(  0, -1*scale, -phi*scale) + center_point; h = rotation * glm::vec3(  1*scale, -phi*scale,  0) + center_point; l = rotation * glm::vec3( -phi*scale,  0, -1*scale) + center_point;
+//nonzero components of the coordinates are scaled by the scale input argument. The result of that operation is multiplied by the composed rotation matrix, then added to the shape's center point
+
+    if(face_thickness)
+    {//draw the faces -
+        draw_triangle( a, g, e, face_thickness, face_material, draw, mask); //AGE
+        draw_triangle( a, i, e, face_thickness, face_material, draw, mask); //AIE
+        draw_triangle( a, c, i, face_thickness, face_material, draw, mask); //ACI
+        draw_triangle( a, c, k, face_thickness, face_material, draw, mask); //ACK
+        draw_triangle( a, g, k, face_thickness, face_material, draw, mask); //AGK
+        draw_triangle( l, b, g, face_thickness, face_material, draw, mask); //LBG
+        draw_triangle( l, g, k, face_thickness, face_material, draw, mask); //LGK
+        draw_triangle( l, f, k, face_thickness, face_material, draw, mask); //LFK
+        draw_triangle( l, d, f, face_thickness, face_material, draw, mask); //LDF
+        draw_triangle( l, d, b, face_thickness, face_material, draw, mask); //LDB
+        draw_triangle( k, f, c, face_thickness, face_material, draw, mask); //KFC
+        draw_triangle( f, h, c, face_thickness, face_material, draw, mask); //FHC
+        draw_triangle( h, i, c, face_thickness, face_material, draw, mask); //HIC
+        draw_triangle( e, j, i, face_thickness, face_material, draw, mask); //EJI
+        draw_triangle( b, g, e, face_thickness, face_material, draw, mask); //BGE
+        draw_triangle( f, h, d, face_thickness, face_material, draw, mask); //FHD
+        draw_triangle( d, h, j, face_thickness, face_material, draw, mask); //DHJ
+        draw_triangle( d, b, j, face_thickness, face_material, draw, mask); //DBJ
+        draw_triangle( b, j, e, face_thickness, face_material, draw, mask); //BJE
+        draw_triangle( h, i, j, face_thickness, face_material, draw, mask); //HIJ
+    }
+
+    if(edge_thickness)
+    {//nonzero value passed for edge thickness
+        //draw the edges
+        //using cylinders of radius edge_thickness
+        draw_cylinder(a,c, edge_thickness, edge_material, draw, mask); //AC
+        draw_cylinder(a,e, edge_thickness, edge_material, draw, mask); //AE
+        draw_cylinder(a,g, edge_thickness, edge_material, draw, mask); //AG
+        draw_cylinder(a,i, edge_thickness, edge_material, draw, mask); //AI
+        draw_cylinder(a,k, edge_thickness, edge_material, draw, mask); //AK
+
+        draw_cylinder(b,d, edge_thickness, edge_material, draw, mask); //BD
+        draw_cylinder(b,e, edge_thickness, edge_material, draw, mask); //BE
+        draw_cylinder(b,g, edge_thickness, edge_material, draw, mask); //BG
+        draw_cylinder(b,j, edge_thickness, edge_material, draw, mask); //BJ
+        draw_cylinder(b,l, edge_thickness, edge_material, draw, mask); //BL
+
+        draw_cylinder(c,f, edge_thickness, edge_material, draw, mask); //CF
+        draw_cylinder(c,h, edge_thickness, edge_material, draw, mask); //CH
+        draw_cylinder(c,i, edge_thickness, edge_material, draw, mask); //CI
+        draw_cylinder(c,k, edge_thickness, edge_material, draw, mask); //CK
+
+        draw_cylinder(d,f, edge_thickness, edge_material, draw, mask); //DF
+        draw_cylinder(d,h, edge_thickness, edge_material, draw, mask); //DH
+        draw_cylinder(d,j, edge_thickness, edge_material, draw, mask); //DJ
+        draw_cylinder(d,l, edge_thickness, edge_material, draw, mask); //DL
+
+        draw_cylinder(e,g, edge_thickness, edge_material, draw, mask); //EG
+        draw_cylinder(e,i, edge_thickness, edge_material, draw, mask); //EI
+        draw_cylinder(e,j, edge_thickness, edge_material, draw, mask); //EJ
+
+        draw_cylinder(f,h, edge_thickness, edge_material, draw, mask); //FH
+        draw_cylinder(f,k, edge_thickness, edge_material, draw, mask); //FK
+        draw_cylinder(f,l, edge_thickness, edge_material, draw, mask); //FL
+
+        draw_cylinder(g,k, edge_thickness, edge_material, draw, mask); //GK
+        draw_cylinder(g,l, edge_thickness, edge_material, draw, mask); //GL
+
+        draw_cylinder(h,i, edge_thickness, edge_material, draw, mask); //HI
+        draw_cylinder(h,j, edge_thickness, edge_material, draw, mask); //HJ
+
+        draw_cylinder(i,j, edge_thickness, edge_material, draw, mask); //IJ
+
+        draw_cylinder(k,l, edge_thickness, edge_material, draw, mask); //KL
+    }
+
+    if(verticies_radius)
+    {//nonzero value passed for vertex radius
+        //draw the vertexes
+        draw_sphere(a, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(b, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(c, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(d, verticies_radius, vertex_material, draw, mask);
+
+        draw_sphere(e, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(f, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(g, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(h, verticies_radius, vertex_material, draw, mask);
+
+        draw_sphere(i, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(j, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(k, verticies_radius, vertex_material, draw, mask);
+        draw_sphere(l, verticies_radius, vertex_material, draw, mask);
+    }
+}
+
+
+// grid
 void GLContainer::draw_grid(glm::ivec3 spacing, glm::ivec3 widths, glm::ivec3 offsets, glm::vec4 color, bool draw, bool mask)
 {
     redraw_flag = true;

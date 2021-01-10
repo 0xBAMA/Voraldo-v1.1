@@ -87,8 +87,8 @@ void Voraldo::create_window()
     SDL_DisplayMode dm;
     SDL_GetDesktopDisplayMode(0, &dm);
 
-    // pulling these out because I'm going to try to span the whole screen with
-    // the window, in a way that's flexible on different resolution screens
+    // pulling these out so I can span the whole screen with the window,
+    // in a way that's flexible on different resolution screens
 
 #ifdef TRIPLE_MONITOR
     total_screen_width = dm.w*3;
@@ -138,7 +138,7 @@ void Voraldo::create_window()
     ImGui_ImplSDL2_InitForOpenGL(window, GLcontext);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    clear_color = ImVec4(42.0f/255.0f, 36.0f/255.0f, 5.0f/255.0f, 1.0f); // initial value for clear color
+    clear_color = ImVec4(10.0f/255.0f, 10.0f/255.0f, 10.0f/255.0f, 1.0f); // initial value for clear color
 
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear( GL_COLOR_BUFFER_BIT );
@@ -850,6 +850,62 @@ void Voraldo::ControlWindow(bool *open)
                     ImGui::EndTabItem();
                 }
 
+                if(ImGui::BeginTabItem(" Icosahedron "))
+                {
+                    static ImVec4 vertex_color;
+                    static float vertex_radius = 0.;
+                    
+                    static ImVec4 edge_color;
+                    static float edge_radius = 0.;
+                    
+                    static ImVec4 face_color;
+                    static float face_thickness = 0.;
+
+                    static glm::vec3 center_point = glm::vec3(0);
+                    static glm::vec3 rotations = glm::vec3(0);
+                    static bool draw = true;
+                    static bool mask = false;
+                    static float scale = 20.0;
+
+                    ImGui::Text(" ");
+                    ImGui::SliderFloat("  scale", &scale, 0.0f, DIM, "%.3f");
+
+                    ImGui::Text(" ");
+                    ImGui::SliderFloat("  xpos", &center_point.x, 0.0f, DIM, "%.3f");
+                    ImGui::SliderFloat("  ypos", &center_point.y, 0.0f, DIM, "%.3f");
+                    ImGui::SliderFloat("  zpos", &center_point.z, 0.0f, DIM, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::Text(" ");
+                    ImGui::SliderFloat("  xrot", &rotations.x, -2.*pi, 2*pi, "%.3f");
+                    ImGui::SliderFloat("  yrot", &rotations.y, -2.*pi, 2*pi, "%.3f");
+                    ImGui::SliderFloat("  zrot", &rotations.z, -2.*pi, 2*pi, "%.3f");
+                    ImGui::Text(" ");
+                    ImGui::Text(" ");
+                    ImGui::SliderFloat("  vertex radius", &vertex_radius, 0., 20., "%.3f");
+                    ImGui::SliderFloat("  edge radius", &edge_radius, 0., 20., "%.3f");
+                    ImGui::SliderFloat("  face thickness", &face_thickness, 0., 20., "%.3f");
+                    ImGui::Text(" ");
+                    
+                    ImGui::ColorEdit4("  Vertex", (float*)&vertex_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+                    ImGui::Text(" ");
+                    ImGui::ColorEdit4("  Edge", (float*)&edge_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+                    ImGui::Text(" ");
+                    ImGui::ColorEdit4("  Face", (float*)&face_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+                    ImGui::Checkbox("  Draw ", &draw);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("  Mask ", &mask);
+                    ImGui::Text(" ");
+                    ImGui::SetCursorPosX(16);
+                    
+                    if(ImGui::Button("Draw", ImVec2(100, 22)))
+                    {
+                        GPU_Data.draw_regular_icosahedron(rotations.x, rotations.y, rotations.z, scale, center_point, glm::vec4(vertex_color.x, vertex_color.y, vertex_color.z, vertex_color.w), vertex_radius, glm::vec4(edge_color.x, edge_color.y, edge_color.z, edge_color.w), edge_radius, glm::vec4(face_color.x, face_color.y, face_color.z, face_color.w), face_thickness, draw, mask);
+                    }
+                    
+                    ImGui::EndTabItem();
+                }
+
                 if(ImGui::BeginTabItem(" Perlin "))
                 {
                     static float perlin_scale_x = 0.014;
@@ -1047,9 +1103,9 @@ void Voraldo::ControlWindow(bool *open)
                     // https://softologyblog.wordpress.com/2017/05/27/voxel-automata-terrain/
                     // https://bitbucket.org/BWerness/voxel-automata-terrain/src/master/
 
-                    static ImVec4 color0 = ImVec4(0,0,0,0);
+                    static ImVec4 color0 = ImVec4(165.0/255.0, 118.0/255.0,  64.0/255.0,  10.0/255.0); // neutral volume color
                     static ImVec4 color1 = ImVec4(210.0/255.0, 180.0/255.0, 140.0/255.0, 105.0/255.0); // Wikipedia Tan
-                    static ImVec4 color2 = ImVec4(143.0/255.0, 151.0/255.0, 121.0/255.0, 95.0/255.0); // Wikipedia Artichoke Green
+                    static ImVec4 color2 = ImVec4(143.0/255.0, 151.0/255.0, 121.0/255.0,  95.0/255.0); // Wikipedia Artichoke Green
 
                     static float lambda = 0.35;
                     static float beta = 0.5;

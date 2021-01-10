@@ -57,6 +57,8 @@ class GLContainer
        // triangle
        void draw_triangle(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3, float thickness, glm::vec4 color, bool draw, bool mask);
 
+       // icosahedron
+       void draw_regular_icosahedron(double x_rot, double y_rot, double z_rot, double scale, glm::vec3 center_point, glm::vec4 vertex_material, double verticies_radius, glm::vec4 edge_material, double edge_thickness, glm::vec4 face_material, float face_thickness, bool draw, bool mask);
 
 
 // GPU-side utilities
