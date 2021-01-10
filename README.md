@@ -22,6 +22,8 @@ Some of the bigger changes I have planned:
  - LUA scripting - using the same interface as the menu buttons do
  - ~~change box blur to a gaussian kernel - weight color contribution by cell alpha~~
  - ~~point lights~~
+ - ~~ACES Tonemapping~~
+ - ~~Icosahedron drawing from v06~~
  - cone lights
  - lighting cache/animation system
  - uniform environment presented to all shaders
