@@ -10,6 +10,8 @@ uniform float ssfactor;
 
 out vec4 fragment_output;
 
+uniform int ACES_behavior;
+
 // APPROX
 // --------------------------
 vec3 cheapo_aces_approx(vec3 v)
@@ -66,7 +68,6 @@ vec3 aces_fitted(vec3 v)
 
 
 
-
 void main()
 {
 	// if(int(gl_FragCoord.y) % 2 == 0 && int(gl_FragCoord.x) % 3 == 0)
@@ -77,8 +78,17 @@ void main()
 	vec4 temp = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
 
 	// tonemapping
-	// temp.xyz = cheapo_aces_approx(temp.xyz); // cheap version
-	temp.xyz = aces_fitted(temp.xyz);       // regular version
+	switch(ACES_behavior)
+	{
+		case 0: // no tonemapping
+			break;
+		case 1: // cheap version
+			temp.xyz = cheapo_aces_approx(temp.xyz);
+			break;
+		case 2: // full version
+			temp.xyz = aces_fitted(temp.xyz);
+			break;
+	}
 
 	// fragment output
 	fragment_output = temp;

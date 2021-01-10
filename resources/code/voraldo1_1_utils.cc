@@ -1730,6 +1730,19 @@ void Voraldo::ControlWindow(bool *open)
             ImGui::Text(" ");
             ImGui::Text(" ");
 
+            ImGui::Text("0 - none");
+            ImGui::Text("1 - cheap");
+            ImGui::Text("2 - full");
+            ImGui::SliderInt("tonemapping mode", &GPU_Data.tonemap_mode, 0, 2);
+            
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
+            ImGui::Separator();
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
             // slider control over phi, theta, scale
             ImGui::Text("Control over display parameters.");
 

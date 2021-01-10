@@ -146,6 +146,7 @@ class GLContainer
         float scale = 7.0f, theta = 0.0f, phi = 0.0f;
 
         float alpha_correction_power = 2.0;
+        int tonemap_mode = 2;
 
         unsigned int screen_width, screen_height;
         int clickndragx = 0;

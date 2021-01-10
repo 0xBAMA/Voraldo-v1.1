@@ -60,6 +60,7 @@ void GLContainer::display_block()
         // alpha power
         glUniform1f(glGetUniformLocation(display_compute_shader, "upow"), alpha_correction_power);
 
+
         // loop through tiles
         for(int x = 0; x < SSFACTOR*screen_width; x += TILESIZE)
         {
@@ -94,6 +95,10 @@ void GLContainer::display_block()
     glBindVertexArray( display_vao );
     glBindBuffer( GL_ARRAY_BUFFER, display_vbo );
 
+    // tonemapping setting
+    glUniform1i(glGetUniformLocation(display_shader, "ACES_behavior"), tonemap_mode);
+
+    // pixel scaling
     glUniform1f(glGetUniformLocation(display_shader, "ssfactor"), SSFACTOR);
 
     // two triangles, 6 verticies
