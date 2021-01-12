@@ -100,7 +100,7 @@ void GLContainer::display_block()
     if(temp_temperature != color_temp)
     {
         temp_temperature = color_temp;
-        glm::vec3 col = get_color_for_temp(color_temp); 
+        glm::vec3 col = get_color_for_temp(double(color_temp)); 
         glUniform3f(glGetUniformLocation(display_shader, "temp_adjustment"), col.x, col.y, col.z);
     }
 
