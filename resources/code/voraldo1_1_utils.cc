@@ -1730,6 +1730,13 @@ void Voraldo::ControlWindow(bool *open)
             ImGui::Text(" ");
             ImGui::Text(" ");
 
+            ImGui::SliderInt("color temp", &GPU_Data.color_temp, 1200, 17000);
+            
+            ImGui::Separator();
+
+            ImGui::Text(" ");
+            ImGui::Text(" ");
+
             ImGui::Text("0 - none");
             ImGui::Text("1 - cheap");
             ImGui::Text("2 - full");

@@ -97,4 +97,59 @@ constexpr double pi = 3.14159265358979323846;
 #define LIGHT_DIM 2048
 
 
+// function to get color temperature
+// ideal range for input values is 1500K - 15000K
+inline glm::vec3 get_color_for_temp(int t)
+{
+    double temp = t / 100.;
+    double red, green, blue;
+
+    // calc red
+    if(temp <= 66.)
+        red = 255.;
+    else
+    {
+        red = temp - 60.;
+        red = 329.698727446 * (std::pow(red,  -0.1332047592));
+    }
+
+    
+    // calc green
+    if(temp <= 66.)
+    {
+        green = temp;
+        green = 99.4708025861 * std::log(green) - 161.1195681661;
+    }
+    else
+    {
+        green = temp - 60.;
+        green = 288.1221695283 * std::pow(green, -0.0755148492); 
+    }
+
+    // calc blue
+    if(temp >= 66.)
+        blue = 255.;
+    else
+    {
+        if(temp <= 19.)
+            blue = 0;
+        else
+        {
+            blue = temp = 10;
+            blue = 138.5177312231 * std::log(blue) - 305.0447927307; 
+        }
+    }
+    
+    // normalize and return
+    std::clamp(  red, 0., 255.);
+    std::clamp(green, 0., 255.);
+    std::clamp( blue, 0., 255.);
+
+    red   /= 255.;
+    green /= 255.;
+    blue  /= 255.;
+
+    return glm::vec3(red, green, blue);
+}
+
 #endif

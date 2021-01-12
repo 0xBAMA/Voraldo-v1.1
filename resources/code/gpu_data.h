@@ -147,6 +147,7 @@ class GLContainer
 
         float alpha_correction_power = 2.0;
         int tonemap_mode = 2;
+        int color_temp = 6500;
 
         unsigned int screen_width, screen_height;
         int clickndragx = 0;

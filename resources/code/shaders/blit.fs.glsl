@@ -10,6 +10,8 @@ uniform float ssfactor;
 
 out vec4 fragment_output;
 
+
+// TONEMAPPING
 uniform int ACES_behavior;
 
 // APPROX
@@ -65,6 +67,22 @@ vec3 aces_fitted(vec3 v)
 
 
 
+// COLOR TEMP ADJUSTMENT
+uniform vec3 temp_adjustment;
+
+mat3 temp_adjust(vec3 c)
+{
+	mat3 t;
+	t[0] = vec3(c.r,   0,   0);
+	t[1] = vec3(  0, c.g,   0);
+	t[2] = vec3(  0,   0, c.b);
+	return t;
+}
+
+
+
+
+
 
 
 
@@ -75,7 +93,12 @@ void main()
 	// else
 	// 	discard;
 	
-	vec4 temp = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
+	vec4 running_color = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
+
+
+	// temperature correction
+	running_color.xyz = temp_adjust(temp_adjustment) * running_color.xyz;
+
 
 	// tonemapping
 	switch(ACES_behavior)
@@ -83,13 +106,13 @@ void main()
 		case 0: // no tonemapping
 			break;
 		case 1: // cheap version
-			temp.xyz = cheapo_aces_approx(temp.xyz);
+			running_color.xyz = cheapo_aces_approx(running_color.xyz);
 			break;
 		case 2: // full version
-			temp.xyz = aces_fitted(temp.xyz);
+			running_color.xyz = aces_fitted(running_color.xyz);
 			break;
 	}
 
 	// fragment output
-	fragment_output = temp;
+	fragment_output = running_color;
 }

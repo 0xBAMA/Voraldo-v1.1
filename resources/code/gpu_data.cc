@@ -16,11 +16,12 @@ void GLContainer::display_block()
     static float temp_clickndragy;
     static float temp_phi;
     static float acp; // alpha correction power
+    static int temp_temperature = 0; // color temperature, done this way so it hooks on the first frame
     static glm::vec4 temp_clear_color;
 
     if((temp_scale != scale) || (temp_theta != theta) || (temp_clickndragx != clickndragx) || (temp_clickndragy != clickndragy) || (temp_phi != phi) || (acp != alpha_correction_power) || (clear_color != temp_clear_color))
         redraw_flag = true;
-
+    
     temp_scale = scale;
     temp_theta = theta;
     temp_clickndragx = clickndragx;
@@ -94,6 +95,14 @@ void GLContainer::display_block()
     glUseProgram( display_shader );
     glBindVertexArray( display_vao );
     glBindBuffer( GL_ARRAY_BUFFER, display_vbo );
+
+    // color temperature
+    if(temp_temperature != color_temp)
+    {
+        temp_temperature = color_temp;
+        glm::vec3 col = get_color_for_temp(color_temp); 
+        glUniform3f(glGetUniformLocation(display_shader, "temp_adjustment"), col.x, col.y, col.z);
+    }
 
     // tonemapping setting
     glUniform1i(glGetUniformLocation(display_shader, "ACES_behavior"), tonemap_mode);
@@ -1358,6 +1367,7 @@ void GLContainer::compute_fake_GI(float factor, float sky_intensity, float thres
 }
 
         // mash (combine light into color buffer)
+        //   realized this morning that in some ways conceptually this really is a form of dynamic range compression
 void GLContainer::mash()
 {
     redraw_flag = true;
