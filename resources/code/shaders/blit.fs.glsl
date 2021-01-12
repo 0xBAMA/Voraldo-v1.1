@@ -93,11 +93,15 @@ void main()
 	// else
 	// 	discard;
 	
-	vec4 running_color = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
-
+	vec4 texread_color = texture(main_display_texture, ssfactor*(gl_FragCoord.xy + gl_SamplePosition.xy));
+	vec4 running_color = texread_color;
 
 	// temperature correction
 	running_color.xyz = temp_adjust(temp_adjustment) * running_color.xyz;
+
+	// luminance preservation
+	running_color.xyz *= dot(texread_color.xyz, vec3(0.2126, 0.7152, 0.0722)) / max(dot(running_color.xyz, vec3(0.2126, 0.7152, 0.0722)), 1e-5);
+
 
 
 	// tonemapping
