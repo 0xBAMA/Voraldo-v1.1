@@ -35,6 +35,8 @@ void GLContainer::display_block()
         // cout << "redrawing" << endl;
         auto t1 = std::chrono::high_resolution_clock::now();
 
+        // regen mipmap
+        
 
         // do the tile based rendering using the raycast compute shader
         glUseProgram(display_compute_shader);
@@ -115,6 +117,73 @@ void GLContainer::display_block()
 
 }
 
+// note that this reads from the OpenGL framebuffer, not mine. This is done to take advantage of the supersampling/filtering and capture exactly what is displayed.
+void GLContainer::single_screenshot()
+{
+    //clear
+    //render - no imgui, just block
+    //front or back buffer? which does it read from, just affects whether or not we need to swap the OpenGL double buffers
+    //if we swap we need to swap back to prevent interruption, else, continue
+
+    // start timing
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    //formatted date and time
+    auto now = std::chrono::system_clock::now( );
+    auto in_time_t = std::chrono::system_clock::to_time_t( now );
+
+    std::stringstream ss;
+    ss << std::put_time( std::localtime( &in_time_t ), "Voraldo1_1Screenshot-%Y-%m-%d %X" ); 
+
+    //append file extension
+    ss << ".png";
+
+#ifdef TRIPLE_MONITOR
+    unsigned width = 3*screen_width;
+#else
+    unsigned width = screen_width;
+#endif
+    
+    // height is the same either way
+    unsigned height = screen_height;
+    
+    // declare buffer and allocate
+    std::vector<unsigned char> image_bytes_to_save, temp;
+    image_bytes_to_save.resize( width * height * 3 );
+
+    //glReadnPixels(...) - this is supposed to be slow, note that this needs to consider TRIPLE_MONITOR define to output a wide image
+    // using the version with the n so you can use a user-provided buffer and saving that directly to keep from having to copy
+    glReadnPixels( 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, width * height * 3, &image_bytes_to_save[0]);
+
+    std::string filename = ss.str();
+    temp.assign(image_bytes_to_save.begin(), image_bytes_to_save.end());
+
+    //reorder flipped image content
+    for(int x = 0; x < width; x++)
+        for(int y = 0; y < height; y++)
+        {
+            int input_base = 3 * ((height - y) * width + x); 
+            int output_base = 3 * ( y * width + x );
+            image_bytes_to_save[output_base+0] = temp[input_base+0];
+            image_bytes_to_save[output_base+1] = temp[input_base+1];
+            image_bytes_to_save[output_base+2] = temp[input_base+2];
+        }
+    
+    //save the resulting image - using the same buffer makes it so you don't have to copy it 
+    unsigned error = lodepng::encode( filename.c_str( ), image_bytes_to_save, width, height, LCT_RGB, 8 );
+
+    if(error) 
+    {
+       std::cout << "encode error during save(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl; 
+    }
+    else
+    {
+        auto t2 = std::chrono::high_resolution_clock::now();
+        cout << "screenshot saved in " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
+    }
+}
+
+    
 void GLContainer::display_orientation_widget()
 {
     // ------------------------

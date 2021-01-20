@@ -18,6 +18,10 @@ class GLContainer
         bool show_widget = true;
         void display() { display_block(); if(show_widget) display_orientation_widget(); }
 
+        // rerenders block only, captures screenshot and saves with formatted filename
+        void single_screenshot();
+
+        
         // part of the quitting operation
         void delete_textures();
         
@@ -167,7 +171,6 @@ class GLContainer
         void compile_shaders();
         void buffer_geometry();
         void load_textures();
-
 
         // helper function for buffer_geometry (used to generate the orientation widget)
         void cube_geometry(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, glm::vec3 e, glm::vec3 f, glm::vec3 g, glm::vec3 h, std::vector<glm::vec3> &points, std::vector<glm::vec3> &normals, std::vector<glm::vec3> &colors, glm::vec3 color);

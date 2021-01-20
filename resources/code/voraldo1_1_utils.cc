@@ -1730,7 +1730,7 @@ void Voraldo::ControlWindow(bool *open)
             ImGui::Text(" ");
             ImGui::Text(" ");
 
-            ImGui::SliderInt("color temp", &GPU_Data.color_temp, 1200, 17000);
+            ImGui::SliderInt("color temp", &GPU_Data.color_temp, 1000, 30000);
             
             ImGui::Separator();
 
@@ -1806,10 +1806,8 @@ void Voraldo::draw_everything()
 
 
 
-
     // draw the stuff on the GPU (block and orientation widget)
     GPU_Data.display();
-
 
 
 
@@ -1878,6 +1876,10 @@ void Voraldo::draw_everything()
             show_controls = !show_controls;
 
 
+        if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s)
+            GPU_Data.single_screenshot();
+            
+        
         // till I come up with a good way to maintain state for the mouse click and drag, this is how that offset is controlled
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_h)
             GPU_Data.clickndragx += SDL_GetModState() & KMOD_SHIFT ? 50 : 5;
@@ -1890,7 +1892,7 @@ void Voraldo::draw_everything()
             GPU_Data.clickndragy -= SDL_GetModState() & KMOD_SHIFT ? 50 : 5;
 
         
-        // specific directions
+        // snap to cardinal directions
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F1)
             GPU_Data.theta = 0.0;
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F2)
@@ -1900,7 +1902,7 @@ void Voraldo::draw_everything()
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_F4)
             GPU_Data.theta = 3.0*(pi/2.0);
 
-
+        // this sucks, need to redo it 
         // if(event.type == SDL_MOUSEMOTION && (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))) // mouse moved, left button down
         // {
         //     int x,y;

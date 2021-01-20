@@ -31,6 +31,10 @@ uniform layout(rgba16) image2D current; // we can get the dimensions with imageS
 uniform layout(rgba8) image3D block;
 uniform layout(r8) image3D lighting;
 
+// samplers
+// uniform sampler3D block;
+// uniform sampler3D lighting;
+
 // because this is going to have to be tile-based, we need this local offset
 uniform int x_offset;
 uniform int y_offset;
