@@ -1877,8 +1877,16 @@ void Voraldo::draw_everything()
 
 
         if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s)
-            GPU_Data.single_screenshot();
-            
+        {
+            if(KMOD_SHIFT)
+            {
+                GPU_Data.spin_capture(NUM_ROTATION_STEPS);
+            }
+            else
+            {
+                GPU_Data.single_screenshot(); 
+            }   
+        }
         
         // till I come up with a good way to maintain state for the mouse click and drag, this is how that offset is controlled
         if(event.type == SDL_KEYDOWN  && event.key.keysym.sym == SDLK_h)

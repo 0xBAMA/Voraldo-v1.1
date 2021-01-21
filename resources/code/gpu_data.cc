@@ -120,11 +120,6 @@ void GLContainer::display_block()
 // note that this reads from the OpenGL framebuffer, not mine. This is done to take advantage of the supersampling/filtering and capture exactly what is displayed.
 void GLContainer::single_screenshot()
 {
-    //clear
-    //render - no imgui, just block
-    //front or back buffer? which does it read from, just affects whether or not we need to swap the OpenGL double buffers
-    //if we swap we need to swap back to prevent interruption, else, continue
-
     // start timing
     auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -159,10 +154,10 @@ void GLContainer::single_screenshot()
     temp.assign(image_bytes_to_save.begin(), image_bytes_to_save.end());
 
     //reorder flipped image content
-    for(int x = 0; x < width; x++)
-        for(int y = 0; y < height; y++)
+    for(int x = 0; x < (int)width; x++)
+        for(int y = 0; y < (int)height; y++)
         {
-            int input_base = 3 * ((height - y) * width + x); 
+            int input_base = 3 * ((height - y - 1) * width + x); 
             int output_base = 3 * ( y * width + x );
             image_bytes_to_save[output_base+0] = temp[input_base+0];
             image_bytes_to_save[output_base+1] = temp[input_base+1];
@@ -181,6 +176,72 @@ void GLContainer::single_screenshot()
         auto t2 = std::chrono::high_resolution_clock::now();
         cout << "screenshot saved in " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds" << endl;
     }
+}
+
+void GLContainer::spin_capture(int steps) // max five digit number of steps in a rotation, I think that's a practical limit
+{
+    bool temp = show_widget;
+    show_widget = false; // don't want this in the screenshot
+
+    for(int i = 0; i < steps; i++)
+    {
+        theta += (2.0*pi)/(double)steps;
+        display_block();
+        // start timing
+        auto t1 = std::chrono::high_resolution_clock::now();
+
+        std::stringstream ss;
+        ss << "frames/step" << std::setfill('0') << std::setw(5) << i;
+
+        //append file extension
+        ss << ".png";
+
+#ifdef TRIPLE_MONITOR
+        unsigned width = 3*screen_width;
+#else
+        unsigned width = screen_width;
+#endif
+    
+        // height is the same either way
+        unsigned height = screen_height;
+    
+        // declare buffer and allocate
+        std::vector<unsigned char> image_bytes_to_save, temp;
+        image_bytes_to_save.resize( width * height * 3 );
+        
+        // screenshot out of back buffer
+        // very similar to single_screenshot() above, but different naming scheme
+        glReadnPixels( 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, width * height * 3, &image_bytes_to_save[0]);
+
+        std::string filename = ss.str();
+        temp.assign(image_bytes_to_save.begin(), image_bytes_to_save.end());
+
+        //reorder flipped image content
+        for(int x = 0; x < (int)width; x++)
+            for(int y = 0; y < (int)height; y++)
+            {
+                int input_base = 3 * ((height - y - 1) * width + x); 
+                int output_base = 3 * ( y * width + x );
+                image_bytes_to_save[output_base+0] = temp[input_base+0];
+                image_bytes_to_save[output_base+1] = temp[input_base+1];
+                image_bytes_to_save[output_base+2] = temp[input_base+2];
+            }
+    
+        //save the resulting image - using the same buffer makes it so you don't have to copy it 
+        unsigned error = lodepng::encode( filename.c_str( ), image_bytes_to_save, width, height, LCT_RGB, 8 );
+
+        if(error) 
+        {
+            std::cout << "encode error during save(\" "+ filename +" \") " << error << ": " << lodepng_error_text(error) << std::endl; 
+        }
+        else
+        {
+            auto t2 = std::chrono::high_resolution_clock::now();
+            cout << "step " << i << " saved in " << std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count() << " microseconds total" << endl;
+        } 
+    }
+    
+    show_widget = temp; // restore
 }
 
     

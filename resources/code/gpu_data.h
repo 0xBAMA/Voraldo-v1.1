@@ -20,7 +20,7 @@ class GLContainer
 
         // rerenders block only, captures screenshot and saves with formatted filename
         void single_screenshot();
-
+        void spin_capture(int steps);
         
         // part of the quitting operation
         void delete_textures();

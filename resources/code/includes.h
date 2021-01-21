@@ -90,9 +90,11 @@ constexpr double pi = 3.14159265358979323846;
 // for the tile based rendering - needs to be a multiple of 32
 #define TILESIZE 64
 
+#define NUM_ROTATION_STEPS 1000
+
 // this sets how many texels are on an edge. Trying not to hardcode this anywhere, so that I can easily switch from 256, 512, 1024, etc
-// #define DIM 512
-#define DIM 256
+#define DIM 512
+// #define DIM 256
 
 
 
