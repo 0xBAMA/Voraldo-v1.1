@@ -133,11 +133,8 @@ void GLContainer::single_screenshot()
     //append file extension
     ss << ".png";
 
-#ifdef TRIPLE_MONITOR
-    unsigned width = 3*screen_width;
-#else
+    // already accounts for TRIPLE_MONITOR
     unsigned width = screen_width;
-#endif
     
     // height is the same either way
     unsigned height = screen_height;
@@ -196,11 +193,8 @@ void GLContainer::spin_capture(int steps) // max five digit number of steps in a
         //append file extension
         ss << ".png";
 
-#ifdef TRIPLE_MONITOR
-        unsigned width = 3*screen_width;
-#else
+        // already accounts for TRIPLE_MONITOR
         unsigned width = screen_width;
-#endif
     
         // height is the same either way
         unsigned height = screen_height;
